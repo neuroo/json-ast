@@ -2,7 +2,7 @@
   "name": "json-ast",
   "version": "2.0.0",
   "description": "JSON parser AST utilities",
-  "author": "Vlad Trushin",
+  "author": "Romain Gaucher",
   "homepage": "https://github.com/neuroo/json-to-ast",
   "repository": "neuroo/json-to-ast",
   "maintainers": [
@@ -13,12 +13,14 @@
     },
     {
       "name": "Romain Gaucher (https://github.com/neuroo)",
+      "email": "r@rgaucher.info",
       "github-username": "neuroo"
     }
   ],
   "license": "MIT",
   "keywords": [
     "json",
+    "extended-json",
     "parser",
     "ast"
   ],
@@ -26,7 +28,7 @@
   "files": [
     "dist",
     "LICENSE",
-    "readme.md"
+    "README.md"
   ],
   "scripts": {
     "build": "gulp es6",
