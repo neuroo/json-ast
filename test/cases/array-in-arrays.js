@@ -1,9 +1,11 @@
 var types = require('../types');
 var position = types.position;
+var doc = types.createDocument;
+var comment = types.createComment;
 var array = types.createArray;
 
 var ast =
-	array([
+	doc(array([
 		array([
 			array([
 				array([
@@ -17,7 +19,7 @@ var ast =
 				], position(1, 4, 3, 1, 14, 13))
 			], position(1, 3, 2, 1, 15, 14))
 		], position(1, 2, 1, 1, 16, 15))
-	], position(1, 1, 0, 1, 17, 16));
+	], position(1, 1, 0, 1, 17, 16)));
 
 module.exports = {
 	ast: ast,
