@@ -1,131 +1,30 @@
 # JSON AST parser
 
-[![NPM version](https://img.shields.io/npm/v/json-to-ast.svg)](https://www.npmjs.com/package/json-to-ast)
-[![NPM Downloads](https://img.shields.io/npm/dm/json-to-ast.svg)](https://www.npmjs.com/package/json-to-ast)
-[![Build Status](https://travis-ci.org/vtrushin/json-to-ast.svg?branch=master)](https://travis-ci.org/vtrushin/json-to-ast)
-<!-- [![Coverage Status](https://coveralls.io/repos/github/vtrushin/json-to-ast/badge.svg?branch=master)](https://coveralls.io/github/vtrushin/json-to-ast?branch=master) -->
+[![Build Status](https://travis-ci.org/neuroo/json-to-ast.svg?branch=master)](https://travis-ci.org/vtrushin/json-to-ast)
 
-> npm install json-to-ast
+## History
+The original code was developed by Vlad Trushin. Breaking modifications were made by Romain Gaucher to create a less strict JSON parser.
+
+Current modification include:
+* Creation of a `Document` root node
+* Support for inline comments
+
+## Features
+The JSON parser accepts a superset of the JSON language, which includes inline comments:
+```json
+// some comment
+{
+  "key1": "value1", // some other comments
+  "key2": "value2"
+}
+// some more comments
+```
+
+Some more features are under development, especially allowing for trailing commas and multi-line comments.
+
 
 ## API
 
-```js
-var parse = require('json-to-ast');
-
-console.log(parse('{"a": 1}'))
-/*
-=>
-{
-  type: 'object',
-  properties: [
-    {
-      type: 'property',
-      key: {
-        type: 'key',
-        value: 'a',
-        position: {
-          start: {
-            line: 1,
-            column: 2,
-            char: 1
-          },
-          end: {
-            line: 1,
-            column: 9,
-            char: 8
-          }
-        }
-      },
-      value: {
-        type: 'number',
-        value: '1',
-        position: {
-          start: {
-            line: 1,
-            column: 11,
-            char: 10
-          },
-          end: {
-            line: 1,
-            column: 12,
-            char: 11
-          }
-        }
-      }
-    }
-  ],
-  position: {
-    start: {
-      line: 1,
-      column: 1,
-      char: 0,
-    },
-    end: {
-      line: 1,
-      column: 13,
-      char: 12
-    }
-  }
-}
-*/
-```
-
-## AST format
-
-Object:
-
-```js
-{
-  type: 'object',
-  properties: [
-    {
-      type: 'property',
-      key: {
-        type: 'key',
-        value: 'keyName',
-        position: {
-          start: {
-            line: ...,
-            column: ...,
-            char: ...
-          },
-          end: {
-            line: ...,
-            column: ...,
-            char: ...
-          }
-        }
-      },
-      value: ...
-    }
-  ],
-  position: {...}
-}
-```
-
-Array:
-
-```js
-{
-  type: 'array',
-  items: [
-    ...
-  ],
-  position: {...}
-}
-```
-
-Primitive:
-
-```js
-{
-  type: 'string|number|true|false|null',
-  value: ...,
-  position: {...}
-}
-```
-
-[Try out online](https://rawgit.com/vtrushin/json-to-ast/master/demo/astexplorer/index.html) (Fork of [astexplorer.net](https://astexplorer.net/))
 
 ## License
-MIT
+MIT Vlad Trushin and Romain Gaucher
