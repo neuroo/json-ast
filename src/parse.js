@@ -52,6 +52,7 @@ function parseObject(source, tokenList, index, settings) {
 
   while (index < tokenList.length) {
     token = tokenList[index];
+
     if (token.type === tokenTypes.COMMENT) {
       let comment = {
         type : nodeTypes.COMMENT,
@@ -132,6 +133,7 @@ function parseObject(source, tokenList, index, settings) {
       let value = parseValue(source, tokenList, index, settings);
       index = value.index;
       property.value = value.value;
+
       object.properties.push(property);
       state = objectStates.VALUE;
       break;
@@ -174,7 +176,7 @@ function parseObject(source, tokenList, index, settings) {
           accept : function(visitor) { visitor.visit(this); }
         };
         if (settings.verbose) {
-          property.key = {position : token.position};
+          property.key.position = token.position;
         }
         state = objectStates.KEY;
         index++;

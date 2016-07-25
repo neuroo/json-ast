@@ -4,5 +4,5 @@
     1, // first value
     2, // second value
     3  // third value
-  ]
+  ], "other": null
 }
