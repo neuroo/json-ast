@@ -35,7 +35,7 @@ class MyVisitor extends Visitor {
   }
 
   comment(commentNode) {
-    this.comments.push(commentNode);
+    this.comments.push(commentNode.value);
   }
 };
 
