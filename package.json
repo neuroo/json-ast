@@ -1,6 +1,6 @@
 {
-  "name": "json-to-ast",
-  "version": "1.2.11",
+  "name": "json-ast",
+  "version": "2.0.0",
   "description": "JSON parser AST utilities",
   "author": "Vlad Trushin",
   "homepage": "https://github.com/neuroo/json-to-ast",
