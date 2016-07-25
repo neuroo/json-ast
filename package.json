@@ -1,15 +1,19 @@
 {
   "name": "json-to-ast",
   "version": "1.2.11",
-  "description": "JSON parser with AST output",
+  "description": "JSON parser AST utilities",
   "author": "Vlad Trushin",
-  "homepage": "https://github.com/vtrushin/json-to-ast",
-  "repository": "vtrushin/json-to-ast",
+  "homepage": "https://github.com/neuroo/json-to-ast",
+  "repository": "neuroo/json-to-ast",
   "maintainers": [
     {
       "name": "Vlad Trushin <monospectr@mail.ru> (https://github.com/vtrushin)",
       "email": "monospectr@mail.ru",
       "github-username": "vtrushin"
+    },
+    {
+      "name": "Romain Gaucher (https://github.com/neuroo)",
+      "github-username": "neuroo"
     }
   ],
   "license": "MIT",
@@ -18,7 +22,7 @@
     "parser",
     "ast"
   ],
-  "main": "dist/parse.js",
+  "main": "dist/index.js",
   "files": [
     "dist",
     "LICENSE",
@@ -26,10 +30,14 @@
   ],
   "scripts": {
     "build": "gulp es6",
-    "test": "mocha",
-    "prepublish": "npm run build"
+    "test": "./node_modules/.bin/_mocha --compilers js:babel-core/register",
+    "prepublish": "npm run build",
+    "coverage": "babel-node node_modules/isparta/bin/isparta cover --report text --report html node_modules/mocha/bin/_mocha -- --reporter dot"
   },
   "devDependencies": {
+    "babel-cli": "^6.11.4",
+    "babel-core": "^6.11.4",
+    "babel-loader": "^6.2.4",
     "babel-plugin-transform-es2015-modules-umd": "^6.6.5",
     "babel-plugin-transform-object-assign": "^6.8.0",
     "babel-polyfill": "^6.3.14",
@@ -38,9 +46,13 @@
     "coveralls": "^2.11.9",
     "del": "^2.0.2",
     "gulp": "^3.9.0",
-    "gulp-babel": "^6.0.0",
+    "gulp-babel": "^6.1.2",
     "gulp-notify": "^2.2.0",
     "gulp-rollup": "^1.7.0",
-    "mocha": "^2.4.5"
+    "isparta": "^4.0.0",
+    "istanbul": "^0.4.4",
+    "lodash": "^4.14.0",
+    "mocha": "^2.4.5",
+    "webpack": "^1.13.1"
   }
 }

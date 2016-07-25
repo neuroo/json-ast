@@ -9,7 +9,12 @@ function position(startLine, startColumn, startChar, endLine, endColumn,
 }
 
 function createDocument(value, position, comments) {
-  var result = {type : 'document', value : value, comments : comments || []};
+  var result = {
+    type : 'document',
+    value : value,
+    comments : comments || [],
+    accept : function() {}
+  };
 
   if (position) {
     result.position = position;
@@ -19,7 +24,7 @@ function createDocument(value, position, comments) {
 }
 
 function createObjectKey(value, position) {
-  var result = {type : 'key', value : value};
+  var result = {type : 'key', value : value, accept : function() {}};
 
   if (position) {
     result.position = position;
@@ -29,14 +34,17 @@ function createObjectKey(value, position) {
 }
 
 function createObjectProperty(key, value) {
-  return { type: 'property', key: key, value: value }
+  return {
+    type: 'property', key: key, value: value, accept: function() {}
+  }
 }
 
 function createObject(properties, position, comments) {
   var result = {
     type : 'object',
     properties : properties,
-    comments : comments || []
+    comments : comments || [],
+    accept : function() {}
   };
 
   if (position) {
@@ -47,7 +55,12 @@ function createObject(properties, position, comments) {
 }
 
 function createArray(items, position, comments) {
-  var result = {type : 'array', items : items, comments : comments || []};
+  var result = {
+    type : 'array',
+    items : items,
+    comments : comments || [],
+    accept : function() {}
+  };
 
   if (position) {
     result.position = position;
@@ -57,7 +70,7 @@ function createArray(items, position, comments) {
 }
 
 function createComment(value, position) {
-  var result = {type : 'comment', value : value};
+  var result = {type : 'comment', value : value, accept : function() {}};
 
   if (position) {
     result.position = position;
@@ -67,7 +80,7 @@ function createComment(value, position) {
 }
 
 function createString(value, position) {
-  var result = {type : 'string', value : value};
+  var result = {type : 'string', value : value, accept : function() {}};
 
   if (position) {
     result.position = position;
@@ -77,7 +90,7 @@ function createString(value, position) {
 }
 
 function createNumber(value, position) {
-  var result = {type : 'number', value : value};
+  var result = {type : 'number', value : value, accept : function() {}};
 
   if (position) {
     result.position = position;
@@ -87,7 +100,7 @@ function createNumber(value, position) {
 }
 
 function createTrue(position) {
-  var result = {type : 'true', value : null};
+  var result = {type : 'true', value : null, accept : function() {}};
 
   if (position) {
     result.position = position;
@@ -97,7 +110,7 @@ function createTrue(position) {
 }
 
 function createFalse(position) {
-  var result = {type : 'false', value : null};
+  var result = {type : 'false', value : null, accept : function() {}};
 
   if (position) {
     result.position = position;
@@ -107,7 +120,7 @@ function createFalse(position) {
 }
 
 function createNull(position) {
-  var result = {type : 'null', value : null};
+  var result = {type : 'null', value : null, accept : function() {}};
 
   if (position) {
     result.position = position;

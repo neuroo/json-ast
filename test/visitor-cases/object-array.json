@@ -1,0 +1,8 @@
+// This is a simple JSON with an object that wraps arrays
+{
+  "key": [
+    1, // first value
+    2, // second value
+    3  // third value
+  ]
+}

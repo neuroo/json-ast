@@ -10,31 +10,16 @@ const src = './src';
 const dist = './dist';
 const distJsPath = dist;
 
-gulp.task('default', [
-	'clean',
-	'es6',
-	'es6:watch'
-]);
+gulp.task('default', [ 'clean', 'es6', 'es6:watch' ]);
 
 // Delete the dist directory
-gulp.task('clean', function(){
-	return del([dist + '/*']);
+gulp.task('clean', function() { return del([ dist + '/*' ]); });
+
+gulp.task('es6', function() {
+  gulp.src([ src + '/index.js' ])
+      .pipe(rollup({format : 'cjs'}).on('error', handleErrors))
+      .pipe(babel().on('error', handleErrors))
+      .pipe(gulp.dest(distJsPath))
 });
 
-gulp.task('es6', function(){
-	gulp.src(src + '/parse.js')
-		.pipe(
-			rollup({
-				format: 'cjs'
-		    })
-		    .on('error', handleErrors)
-		)
-		.pipe(
-			babel().on('error', handleErrors)
-		)
-		.pipe(gulp.dest(distJsPath))
-});
-
-gulp.task('es6:watch', function () {
-	gulp.watch(src + '/**/*.js', ['es6']);
-});
+gulp.task('es6:watch', function() { gulp.watch(src + '/**/*.js', [ 'es6' ]); });

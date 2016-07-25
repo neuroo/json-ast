@@ -2,7 +2,11 @@ var fs = require('fs');
 var path = require('path');
 var util = require('util');
 var assert = require('assert');
-var parse = require('../dist/parse.js');
+var _ = require('lodash');
+var json_to_ast = require('../dist');
+
+var parse = json_to_ast.parse;
+var Visitor = json_to_ast.Visitor;
 
 function readFile(file) {
   var src = fs.readFileSync(file, 'utf8');
@@ -37,7 +41,10 @@ describe('Test cases', function() {
   getCases('cases', function(caseName, inputFile, expectedFile) {
     it(caseName, function() {
       var parsedFile = parse(inputFile, expectedFile.options);
-      assert.deepEqual(parsedFile, expectedFile.ast, 'asts are not equal');
+      // Now that we include methods in each Node, a simple way to test for
+      // equality is to serialize the objects.
+      assert.deepEqual(JSON.stringify(parsedFile),
+                       JSON.stringify(expectedFile.ast), 'asts are not equal');
     });
   });
 });
@@ -51,6 +58,44 @@ describe('Error test cases', function() {
         assert.deepEqual(expectedFile.error.message, e.rawMessage,
                          'asts are not equal');
       }
+    });
+  });
+});
+
+// A simple visitor that will aggregate the values by type of Node
+class TestAccumulatorVisitor extends Visitor {
+  constructor(store) {
+    super();
+    this.store = store;
+  }
+
+  comment(commentNode) {
+    this.store.comments = this.store.comments || [];
+    this.store.comments.push(commentNode.value);
+  };
+
+  key(keyNode) {
+    this.store.keys = this.store.keys || [];
+    this.store.keys.push(keyNode.value);
+  };
+
+  value(valueNode) {
+    this.store.values = this.store.values || [];
+    this.store.values.push(valueNode.value);
+  }
+};
+
+describe('Visitor cases', function() {
+  getCases('visitor-cases', function(caseName, inputFile, expectedFile) {
+    it(caseName, function() {
+      const documentNode = parse(inputFile, inputFile, expectedFile);
+      const store = {};
+      const accVisitor = new TestAccumulatorVisitor(store);
+
+      documentNode.accept(accVisitor);
+      assert.deepEqual(store.comments, expectedFile.visitor.comments);
+      assert.deepEqual(store.keys, expectedFile.visitor.keys);
+      assert.deepEqual(store.values, expectedFile.visitor.values);
     });
   });
 });

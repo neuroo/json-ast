@@ -1,6 +1,6 @@
 # JSON AST parser
 
-[![Build Status](https://travis-ci.org/neuroo/json-to-ast.svg?branch=master)](https://travis-ci.org/neuroo/json-to-ast.svg)
+[![Build Status](https://travis-ci.org/neuroo/json-to-ast.svg?branch=master)](https://travis-ci.org/neuroo/json-to-ast)
 
 ## History
 The original code was developed by Vlad Trushin. Breaking modifications were made by Romain Gaucher to create a less strict JSON parser.
@@ -8,6 +8,7 @@ The original code was developed by Vlad Trushin. Breaking modifications were mad
 Current modification include:
 * Creation of a `Document` root node
 * Support for inline comments
+* Include visitor pattern to visit the AST
 
 ## Features
 The JSON parser accepts a superset of the JSON language, which includes inline comments:
@@ -22,8 +23,32 @@ The JSON parser accepts a superset of the JSON language, which includes inline c
 
 Some more features are under development, especially allowing for trailing commas and multi-line comments.
 
-
 ## API
+```javascript
+import {parse, Visitor} from 'json-ast';
+
+
+class MyVisitor extends Visitor {
+  constructor() {
+    super();
+    this.comments = [];
+  }
+
+  comment(commentNode) {
+    this.comments.push(commentNode);
+  }
+};
+
+const JSON_BUFFER = `// Some comment
+{
+  "key": "value"
+}`;
+
+const ast = parse(JSON_BUFFER, {verbose: true});
+const visitor = new MyVisitor();
+ast.visit(visitor);
+assert.deepEqual(visitor.comments, [" Some comment"]);
+```
 
 
 ## License

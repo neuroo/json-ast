@@ -24,17 +24,40 @@ const defaultSettings = {
   verbose : true
 };
 
+export const nodeTypes = {
+  DOCUMENT : 'document',
+  COMMENT : 'comment',
+  OBJECT : 'object',
+  PROPERTY : 'property',
+  KEY : 'key',
+  ARRAY : 'array',
+  STRING : 'string',
+  NUMBER : 'number',
+  TRUE : 'true',
+  FALSE : 'false',
+  NULL : 'null'
+};
+
 function parseObject(source, tokenList, index, settings) {
   let startToken;
   let property;
-  let object = {type : 'object', properties : [], comments : []};
+  let object = {
+    type : nodeTypes.OBJECT,
+    properties : [],
+    comments : [],
+    accept : function(visitor) { visitor.visit(this); }
+  };
   let state = objectStates._START_;
   let token;
 
   while (index < tokenList.length) {
     token = tokenList[index];
     if (token.type === tokenTypes.COMMENT) {
-      let comment = {type : 'comment', value : token.value};
+      let comment = {
+        type : nodeTypes.COMMENT,
+        value : token.value,
+        accept : function(visitor) { visitor.visit(this); }
+      };
       if (settings.verbose) {
         comment.position = token.position;
       }
@@ -57,8 +80,13 @@ function parseObject(source, tokenList, index, settings) {
     case objectStates.OPEN_OBJECT:
       if (token.type === tokenTypes.STRING) {
         property = {
-          type : 'property',
-          key : {type : 'key', value : token.value}
+          type : nodeTypes.PROPERTY,
+          key : {
+            type : nodeTypes.KEY,
+            value : token.value,
+            accept : function(visitor) { visitor.visit(this); }
+          },
+          accept : function(visitor) { visitor.visit(this); }
         };
         if (settings.verbose) {
           property.key.position = token.position;
@@ -73,7 +101,11 @@ function parseObject(source, tokenList, index, settings) {
               token.position.end.column, token.position.end.char);
         }
         index++;
-        return {value : object, index : index};
+        return {
+          value : object,
+          index : index,
+          accept : function(visitor) { visitor.visit(this); }
+        };
       } else {
         error(parseErrorTypes.unexpectedToken(
                   source.substring(token.position.start.char,
@@ -113,7 +145,11 @@ function parseObject(source, tokenList, index, settings) {
               token.position.end.column, token.position.end.char);
         }
         index++;
-        return {value : object, index : index};
+        return {
+          value : object,
+          index : index,
+          accept : function(visitor) { visitor.visit(this); }
+        };
       } else if (token.type === tokenTypes.COMMA) {
         state = objectStates.COMMA;
         index++;
@@ -129,8 +165,13 @@ function parseObject(source, tokenList, index, settings) {
     case objectStates.COMMA:
       if (token.type === tokenTypes.STRING) {
         property = {
-          type : 'property',
-          key : {type : 'key', value : token.value}
+          type : nodeTypes.PROPERTY,
+          key : {
+            type : nodeTypes.KEY,
+            value : token.value,
+            accept : function(visitor) { visitor.visit(this); }
+          },
+          accept : function(visitor) { visitor.visit(this); }
         };
         if (settings.verbose) {
           property.key = {position : token.position};
@@ -153,14 +194,23 @@ function parseObject(source, tokenList, index, settings) {
 
 function parseArray(source, tokenList, index, settings) {
   let startToken;
-  let array = {type : 'array', items : [], comments : []};
+  let array = {
+    type : nodeTypes.ARRAY,
+    items : [],
+    comments : [],
+    accept : function(visitor) { visitor.visit(this); }
+  };
   let state = arrayStates._START_;
   let token;
 
   while (index < tokenList.length) {
     token = tokenList[index];
     if (token.type === tokenTypes.COMMENT) {
-      let comment = {type : 'comment', value : token.value};
+      let comment = {
+        type : nodeTypes.COMMENT,
+        value : token.value,
+        accept : function(visitor) { visitor.visit(this); }
+      };
       if (settings.verbose) {
         comment.position = token.position;
       }
@@ -189,7 +239,11 @@ function parseArray(source, tokenList, index, settings) {
               token.position.end.column, token.position.end.char);
         }
         index++;
-        return {value : array, index : index};
+        return {
+          value : array,
+          index : index,
+          accept : function(visitor) { visitor.visit(this); }
+        };
       } else {
         let value = parseValue(source, tokenList, index, settings);
         index = value.index;
@@ -207,7 +261,11 @@ function parseArray(source, tokenList, index, settings) {
               token.position.end.column, token.position.end.char);
         }
         index++;
-        return {value : array, index : index};
+        return {
+          value : array,
+          index : index,
+          accept : function(visitor) { visitor.visit(this); }
+        };
       } else if (token.type === tokenTypes.COMMA) {
         state = arrayStates.COMMA;
         index++;
@@ -262,11 +320,19 @@ function parseValue(source, tokenList, index, settings) {
 
   if (tokenType) {
     index++;
-    let value = {type : tokenType, value : token.value};
+    let value = {
+      type : tokenType,
+      value : token.value,
+      accept : function(visitor) { visitor.visit(this); }
+    };
     if (settings.verbose) {
       value.position = token.position;
     }
-    return {value : value, index : index};
+    return {
+      value : value,
+      index : index,
+      accept : function(visitor) { visitor.visit(this); }
+    };
   } else {
     let objectOrValue = parseObject(source, tokenList, index, settings) ||
                         parseArray(source, tokenList, index, settings);
@@ -288,10 +354,19 @@ function parseDocument(source, tokenList, index, settings) {
   let token = tokenList[index];
   let tokenType = token.type;
 
-  let doc = {type : 'document', value : null, comments : []};
+  let doc = {
+    type : nodeTypes.DOCUMENT,
+    value : null,
+    comments : [],
+    accept : function(visitor) { visitor.visit(this); }
+  };
 
   while (tokenType === tokenTypes.COMMENT) {
-    let comment = {type : 'comment', value : token.value};
+    let comment = {
+      type : nodeTypes.COMMENT,
+      value : token.value,
+      accept : function(visitor) { visitor.visit(this); }
+    };
     if (settings.verbose) {
       comment.position = token.position;
     }
@@ -312,7 +387,11 @@ function parseDocument(source, tokenList, index, settings) {
       tokenType = token.type;
       doc.value.index = index;
 
-      let comment = {type : 'comment', value : token.value};
+      let comment = {
+        type : nodeTypes.COMMENT,
+        value : token.value,
+        accept : function(visitor) { visitor.visit(this); }
+      };
 
       if (settings.verbose) {
         comment.position = token.position;
@@ -330,7 +409,7 @@ function parseDocument(source, tokenList, index, settings) {
   return {value : doc, index : final_index};
 }
 
-export default function(source, settings) {
+export function parse(source, settings) {
   settings = Object.assign({}, defaultSettings, settings);
 
   const tokenList = tokenize(source);
