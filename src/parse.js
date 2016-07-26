@@ -180,6 +180,12 @@ function parseObject(source, tokenList, index, settings) {
         }
         state = objectStates.KEY;
         index++;
+      } else if (token.type === tokenTypes.COMMA ||
+                 token.type === tokenTypes.RIGHT_BRACE) {
+        // Allow trailing commas
+        state = objectStates.VALUE;
+        // index++;
+        continue;
       } else {
         error(parseErrorTypes.unexpectedToken(
                   source.substring(token.position.start.char,
@@ -281,6 +287,12 @@ function parseArray(source, tokenList, index, settings) {
       break;
 
     case arrayStates.COMMA:
+      // Allow for trailing commas and too many commas
+      if (token.type === tokenTypes.COMMA ||
+          token.type === tokenTypes.RIGHT_BRACKET) {
+        state = arrayStates.VALUE;
+        continue;
+      }
       let value = parseValue(source, tokenList, index, settings);
       index = value.index;
       array.items.push(value.value);

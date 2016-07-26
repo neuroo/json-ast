@@ -1,0 +1,8 @@
+{
+  "a": 1,
+  // This is a comment
+  ,
+  ,
+  "b": 2,,,,,,,,,,,,,,
+  // This is another comment
+}
