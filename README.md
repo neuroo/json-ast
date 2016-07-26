@@ -1,6 +1,6 @@
 # JSON AST parser
 
-[![Build Status](https://travis-ci.org/neuroo/json-to-ast.svg?branch=master)](https://travis-ci.org/neuroo/json-to-ast)
+[![Build Status](https://travis-ci.org/neuroo/json-ast.svg?branch=master)](https://travis-ci.org/neuroo/json-ast)
 
 ## History
 The original code was developed by Vlad Trushin. Breaking modifications were made by Romain Gaucher to create a less strict JSON parser.
