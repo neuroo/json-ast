@@ -7,21 +7,22 @@ The original code was developed by Vlad Trushin. Breaking modifications were mad
 
 Current modification include:
 * Creation of a `Document` root node
-* Support for inline comments
+* Support for [inline comments](test/cases/comment-in-object.json)
+* Support for [trailing commas and many consecutive commas](test/cases/object-trailing-commas.json)
 * Include visitor pattern to visit the AST
 
 ## Features
-The JSON parser accepts a superset of the JSON language, which includes inline comments:
+The JSON parser accepts a superset of the JSON language:
 ```json
 // some comment
 {
   "key1": "value1", // some other comments
-  "key2": "value2"
+  "key2": "value2",
 }
 // some more comments
 ```
 
-Some more features are under development, especially allowing for trailing commas and multi-line comments.
+Some more features are under development, especially multi-line comments.
 
 ## API
 ```javascript
