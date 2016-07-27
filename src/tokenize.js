@@ -1,4 +1,4 @@
-import position from './position';
+import Position from './position';
 import error from './error';
 import tokenizeErrorTypes from './tokenizeErrorTypes';
 
@@ -385,8 +385,8 @@ export function tokenize(source, settings) {
       let token = {type : matched.type, value : matched.value};
 
       if (settings.verbose) {
-        token.position = position(line, column, index, matched.line,
-                                  matched.column, matched.index);
+        token.position = new Position(line, column, index, matched.line,
+                                      matched.column, matched.index);
       }
 
       tokens.push(token);

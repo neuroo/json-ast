@@ -1,30 +1,27 @@
+import * as AST from '../src/ast';
+import Position from '../src/position';
+
 function position(startLine, startColumn, startChar, endLine, endColumn,
                   endChar) {
-  return {
-    start: {line : startLine, column : startColumn, char : startChar},
-        end: {line : endLine, column : endColumn, char : endChar},
-        human:
-            `${startLine}:${startColumn} - ${endLine}:${endColumn} [${startChar}:${endChar}]`
-  }
+  return new Position(startLine, startColumn, startChar, endLine, endColumn,
+                      endChar);
 }
 
 function createDocument(value, position, comments) {
-  var result = {
-    type : 'document',
-    value : value,
-    comments : comments || [],
-    accept : function() {}
-  };
+  let result = new AST.JsonDocument();
+  result.child = value;
+  if (comments) {
+    comments.forEach((comment) => result.comments.push(comment));
+  }
 
   if (position) {
     result.position = position;
   }
-
   return result;
 }
 
 function createObjectKey(value, position) {
-  var result = {type : 'key', value : value, accept : function() {}};
+  var result = new AST.JsonKey(value);
 
   if (position) {
     result.position = position;
@@ -34,34 +31,34 @@ function createObjectKey(value, position) {
 }
 
 function createObjectProperty(key, value) {
-  return {
-    type: 'property', key: key, value: value, accept: function() {}
-  }
+  let result = new AST.JsonProperty();
+  result.key = key;
+  result.value = value;
+  return result;
 }
 
 function createObject(properties, position, comments) {
-  var result = {
-    type : 'object',
-    properties : properties,
-    comments : comments || [],
-    accept : function() {}
-  };
-
+  var result = new AST.JsonObject();
+  if (properties) {
+    properties.forEach((prop) => result.properties.push(prop));
+  }
+  if (comments) {
+    comments.forEach((comment) => result.comments.push(comment));
+  }
   if (position) {
     result.position = position;
   }
-
   return result;
 }
 
 function createArray(items, position, comments) {
-  var result = {
-    type : 'array',
-    items : items,
-    comments : comments || [],
-    accept : function() {}
-  };
-
+  var result = new AST.JsonArray();
+  if (items) {
+    items.forEach((prop) => result.items.push(prop));
+  }
+  if (comments) {
+    comments.forEach((comment) => result.comments.push(comment));
+  }
   if (position) {
     result.position = position;
   }
@@ -70,7 +67,7 @@ function createArray(items, position, comments) {
 }
 
 function createComment(value, position) {
-  var result = {type : 'comment', value : value, accept : function() {}};
+  var result = new AST.JsonComment(value);
 
   if (position) {
     result.position = position;
@@ -80,7 +77,7 @@ function createComment(value, position) {
 }
 
 function createString(value, position) {
-  var result = {type : 'string', value : value, accept : function() {}};
+  var result = new AST.JsonString(value);
 
   if (position) {
     result.position = position;
@@ -90,7 +87,7 @@ function createString(value, position) {
 }
 
 function createNumber(value, position) {
-  var result = {type : 'number', value : value, accept : function() {}};
+  var result = new AST.JsonNumber(value);
 
   if (position) {
     result.position = position;
@@ -100,7 +97,7 @@ function createNumber(value, position) {
 }
 
 function createTrue(position) {
-  var result = {type : 'true', value : null, accept : function() {}};
+  var result = new AST.JsonTrue();
 
   if (position) {
     result.position = position;
@@ -110,7 +107,7 @@ function createTrue(position) {
 }
 
 function createFalse(position) {
-  var result = {type : 'false', value : null, accept : function() {}};
+  var result = new AST.JsonFalse();
 
   if (position) {
     result.position = position;
@@ -120,7 +117,7 @@ function createFalse(position) {
 }
 
 function createNull(position) {
-  var result = {type : 'null', value : null, accept : function() {}};
+  var result = new AST.JsonNull();
 
   if (position) {
     result.position = position;

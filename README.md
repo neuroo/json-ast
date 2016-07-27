@@ -6,7 +6,7 @@
 The original code was developed by Vlad Trushin. Breaking modifications were made by Romain Gaucher to create a less strict JSON parser.
 
 Current modification include:
-* Creation of a `Document` root node
+* Creation of a `JsonDocument` root node and [more formal AST structure](src/ast.js)
 * Support for [inline comments](test/cases/comment-in-object.json)
 * Support for [trailing commas and many consecutive commas](test/cases/object-trailing-commas.json)
 * Include visitor pattern to visit the AST
@@ -24,9 +24,47 @@ The JSON parser accepts a superset of the JSON language:
 
 Some more features are under development, especially multi-line comments.
 
+## Structure of the AST
+As of 2.1.0, the AST is defined with the following types:
+
+```javascript
+[JsonNode] // Essentially an abstract class
+  position: [Position]
+
+[JsonDocument] extends [JsonNode]
+  child: [?]*
+  comments: [JsonComment]*
+
+[JsonValue] extends [JsonNode]
+  value: [?]
+
+[JsonObject] extends [JsonNode]
+  properties: [JsonProperty]*
+  comments: [JsonComment]*
+
+[JsonProperty] extends [JsonNode]
+  key: [JsonKey]
+  value: [?]*
+
+[JsonKey] extends [JsonValue]
+
+[JsonArray]
+  items: *
+  comments: [JsonComment]*
+
+[JsonComment] extends [JsonValue]
+[JsonString] extends [JsonValue]
+[JsonNumber] extends [JsonValue]
+[JsonTrue] extends [JsonValue]
+[JsonFalse] extends [JsonValue]
+[JsonNumber] extends [JsonValue]
+```
+
+All the types exists in [src/ast.js](src/ast.js).
+
 ## API
 ```javascript
-import {parse, Visitor} from 'json-ast';
+import {parse, Visitor, AST} from 'json-ast';
 
 
 class MyVisitor extends Visitor {
@@ -45,7 +83,9 @@ const JSON_BUFFER = `// Some comment
   "key": "value"
 }`;
 
+// `verbose` will include the position in each node
 const ast = parse(JSON_BUFFER, {verbose: true});
+assert(ast instanceof AST.JsonDocument);
 const visitor = new MyVisitor();
 ast.visit(visitor);
 assert.deepEqual(visitor.comments, [" Some comment"]);

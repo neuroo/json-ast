@@ -1,5 +1,5 @@
 import position from './position';
-import {nodeTypes} from './parse';
+import {nodeTypes} from './ast';
 
 // Do not export this function as it provides the main traversal of the AST
 function traverseAST(visitor, node) {
@@ -9,8 +9,8 @@ function traverseAST(visitor, node) {
     if (node.comments) {
       node.comments.forEach((commentNode) => { visitor.comment(commentNode); });
     }
-    if (node.value) {
-      node.value.accept(visitor);
+    if (node.child) {
+      node.child.accept(visitor);
     }
     break;
   }

@@ -1,8 +1,8 @@
-var util = require('util');
-import position from './position';
+import Position from './position';
 import error from './error';
 import parseErrorTypes from './parseErrorTypes';
 import {tokenize, tokenTypes} from './tokenize';
+import {nodeTypes, NodeFactory, JsonNode} from './ast';
 
 const objectStates = {
   _START_ : 0,
@@ -24,29 +24,11 @@ const defaultSettings = {
   verbose : true
 };
 
-export const nodeTypes = {
-  DOCUMENT : 'document',
-  COMMENT : 'comment',
-  OBJECT : 'object',
-  PROPERTY : 'property',
-  KEY : 'key',
-  ARRAY : 'array',
-  STRING : 'string',
-  NUMBER : 'number',
-  TRUE : 'true',
-  FALSE : 'false',
-  NULL : 'null'
-};
-
 function parseObject(source, tokenList, index, settings) {
   let startToken;
   let property;
-  let object = {
-    type : nodeTypes.OBJECT,
-    properties : [],
-    comments : [],
-    accept : function(visitor) { visitor.visit(this); }
-  };
+  let object = new NodeFactory.fromType(nodeTypes.OBJECT);
+
   let state = objectStates._START_;
   let token;
 
@@ -54,11 +36,7 @@ function parseObject(source, tokenList, index, settings) {
     token = tokenList[index];
 
     if (token.type === tokenTypes.COMMENT) {
-      let comment = {
-        type : nodeTypes.COMMENT,
-        value : token.value,
-        accept : function(visitor) { visitor.visit(this); }
-      };
+      let comment = new NodeFactory.fromType(nodeTypes.COMMENT, token.value);
       if (settings.verbose) {
         comment.position = token.position;
       }
@@ -80,15 +58,9 @@ function parseObject(source, tokenList, index, settings) {
 
     case objectStates.OPEN_OBJECT:
       if (token.type === tokenTypes.STRING) {
-        property = {
-          type : nodeTypes.PROPERTY,
-          key : {
-            type : nodeTypes.KEY,
-            value : token.value,
-            accept : function(visitor) { visitor.visit(this); }
-          },
-          accept : function(visitor) { visitor.visit(this); }
-        };
+        property = new NodeFactory.fromType(nodeTypes.PROPERTY);
+        property.key = new NodeFactory.fromType(nodeTypes.KEY, token.value);
+
         if (settings.verbose) {
           property.key.position = token.position;
         }
@@ -96,7 +68,7 @@ function parseObject(source, tokenList, index, settings) {
         index++;
       } else if (token.type === tokenTypes.RIGHT_BRACE) {
         if (settings.verbose) {
-          object.position = position(
+          object.position = new Position(
               startToken.position.start.line, startToken.position.start.column,
               startToken.position.start.char, token.position.end.line,
               token.position.end.column, token.position.end.char);
@@ -141,7 +113,7 @@ function parseObject(source, tokenList, index, settings) {
     case objectStates.VALUE:
       if (token.type === tokenTypes.RIGHT_BRACE) {
         if (settings.verbose) {
-          object.position = position(
+          object.position = new Position(
               startToken.position.start.line, startToken.position.start.column,
               startToken.position.start.char, token.position.end.line,
               token.position.end.column, token.position.end.char);
@@ -166,15 +138,9 @@ function parseObject(source, tokenList, index, settings) {
 
     case objectStates.COMMA:
       if (token.type === tokenTypes.STRING) {
-        property = {
-          type : nodeTypes.PROPERTY,
-          key : {
-            type : nodeTypes.KEY,
-            value : token.value,
-            accept : function(visitor) { visitor.visit(this); }
-          },
-          accept : function(visitor) { visitor.visit(this); }
-        };
+        property = new NodeFactory.fromType(nodeTypes.PROPERTY);
+        property.key = new NodeFactory.fromType(nodeTypes.KEY, token.value);
+
         if (settings.verbose) {
           property.key.position = token.position;
         }
@@ -202,23 +168,14 @@ function parseObject(source, tokenList, index, settings) {
 
 function parseArray(source, tokenList, index, settings) {
   let startToken;
-  let array = {
-    type : nodeTypes.ARRAY,
-    items : [],
-    comments : [],
-    accept : function(visitor) { visitor.visit(this); }
-  };
+  let array = new NodeFactory.fromType(nodeTypes.ARRAY);
   let state = arrayStates._START_;
   let token;
 
   while (index < tokenList.length) {
     token = tokenList[index];
     if (token.type === tokenTypes.COMMENT) {
-      let comment = {
-        type : nodeTypes.COMMENT,
-        value : token.value,
-        accept : function(visitor) { visitor.visit(this); }
-      };
+      let comment = new NodeFactory.fromType(nodeTypes.COMMENT, token.value);
       if (settings.verbose) {
         comment.position = token.position;
       }
@@ -241,17 +198,13 @@ function parseArray(source, tokenList, index, settings) {
     case arrayStates.OPEN_ARRAY:
       if (token.type === tokenTypes.RIGHT_BRACKET) {
         if (settings.verbose) {
-          array.position = position(
+          array.position = new Position(
               startToken.position.start.line, startToken.position.start.column,
               startToken.position.start.char, token.position.end.line,
               token.position.end.column, token.position.end.char);
         }
         index++;
-        return {
-          value : array,
-          index : index,
-          accept : function(visitor) { visitor.visit(this); }
-        };
+        return {value : array, index : index};
       } else {
         let value = parseValue(source, tokenList, index, settings);
         index = value.index;
@@ -263,17 +216,13 @@ function parseArray(source, tokenList, index, settings) {
     case arrayStates.VALUE:
       if (token.type === tokenTypes.RIGHT_BRACKET) {
         if (settings.verbose) {
-          array.position = position(
+          array.position = new Position(
               startToken.position.start.line, startToken.position.start.column,
               startToken.position.start.char, token.position.end.line,
               token.position.end.column, token.position.end.char);
         }
         index++;
-        return {
-          value : array,
-          index : index,
-          accept : function(visitor) { visitor.visit(this); }
-        };
+        return {value : array, index : index};
       } else if (token.type === tokenTypes.COMMA) {
         state = arrayStates.COMMA;
         index++;
@@ -334,19 +283,11 @@ function parseValue(source, tokenList, index, settings) {
 
   if (tokenType) {
     index++;
-    let value = {
-      type : tokenType,
-      value : token.value,
-      accept : function(visitor) { visitor.visit(this); }
-    };
+    let value = new NodeFactory.fromType(tokenType, token.value);
     if (settings.verbose) {
       value.position = token.position;
     }
-    return {
-      value : value,
-      index : index,
-      accept : function(visitor) { visitor.visit(this); }
-    };
+    return {value : value, index : index};
   } else {
     let objectOrValue = parseObject(source, tokenList, index, settings) ||
                         parseArray(source, tokenList, index, settings);
@@ -368,19 +309,10 @@ function parseDocument(source, tokenList, index, settings) {
   let token = tokenList[index];
   let tokenType = token.type;
 
-  let doc = {
-    type : nodeTypes.DOCUMENT,
-    value : null,
-    comments : [],
-    accept : function(visitor) { visitor.visit(this); }
-  };
+  let doc = new NodeFactory.fromType(nodeTypes.DOCUMENT);
 
   while (tokenType === tokenTypes.COMMENT) {
-    let comment = {
-      type : nodeTypes.COMMENT,
-      value : token.value,
-      accept : function(visitor) { visitor.visit(this); }
-    };
+    let comment = new NodeFactory.fromType(nodeTypes.COMMENT, token.value);
     if (settings.verbose) {
       comment.position = token.position;
     }
@@ -390,35 +322,30 @@ function parseDocument(source, tokenList, index, settings) {
     tokenType = token.type;
   }
 
-  doc.value = parseValue(source, tokenList, index, settings);
+  doc.child = parseValue(source, tokenList, index, settings);
 
-  if (doc.value.index !== tokenList.length) {
-    index = doc.value.index;
+  if (doc.child.index !== tokenList.length) {
+    index = doc.child.index;
 
     while (index < tokenList.length &&
            tokenList[index].type === tokenTypes.COMMENT) {
       token = tokenList[index];
       tokenType = token.type;
-      doc.value.index = index;
+      doc.child.index = index;
 
-      let comment = {
-        type : nodeTypes.COMMENT,
-        value : token.value,
-        accept : function(visitor) { visitor.visit(this); }
-      };
-
+      let comment = new NodeFactory.fromType(nodeTypes.COMMENT, token.value);
       if (settings.verbose) {
         comment.position = token.position;
       }
       doc.comments.push(comment);
       index++;
     }
-    doc.value.index = index;
+    doc.child.index = index;
   }
 
-  const final_index = doc.value.index;
-  if (!('type' in doc.value) && doc.value.value) {
-    doc.value = doc.value.value;
+  const final_index = doc.child.index;
+  if (!(doc.child instanceof JsonNode) && doc.child.value) {
+    doc.child = doc.child.value;
   }
   return {value : doc, index : final_index};
 }
