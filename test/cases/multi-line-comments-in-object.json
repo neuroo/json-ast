@@ -1,0 +1,24 @@
+/* before-everything - 1*/
+/* before-everything - 2*/
+{
+  /* first-comment*/
+  "a": 1,
+  /*
+
+    This is a multi-line comment
+
+  */
+  /* second-comment*/
+  "b": [
+    /* null-value*/
+    1,
+    /*/* /* /* /* /* /*/
+  ]
+}
+/* after-everything*/
+
+/*
+
+Yet another comment
+
+*/

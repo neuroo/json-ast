@@ -74,11 +74,7 @@ function parseObject(source, tokenList, index, settings) {
               token.position.end.column, token.position.end.char);
         }
         index++;
-        return {
-          value : object,
-          index : index,
-          accept : function(visitor) { visitor.visit(this); }
-        };
+        return {value : object, index : index};
       } else {
         error(parseErrorTypes.unexpectedToken(
                   source.substring(token.position.start.char,
@@ -119,11 +115,7 @@ function parseObject(source, tokenList, index, settings) {
               token.position.end.column, token.position.end.char);
         }
         index++;
-        return {
-          value : object,
-          index : index,
-          accept : function(visitor) { visitor.visit(this); }
-        };
+        return {value : object, index : index};
       } else if (token.type === tokenTypes.COMMA) {
         state = objectStates.COMMA;
         index++;

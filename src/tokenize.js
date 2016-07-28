@@ -3,7 +3,7 @@ import error from './error';
 import tokenizeErrorTypes from './tokenizeErrorTypes';
 
 export const tokenTypes = {
-  COMMENT : 'COMMENT',             // // ... \n\r?
+  COMMENT : 'COMMENT',             // // ... \n\r? or /* ... */
   LEFT_BRACE : 'LEFT_BRACE',       // {
   RIGHT_BRACE : 'RIGHT_BRACE',     // }
   LEFT_BRACKET : 'LEFT_BRACKET',   // [
@@ -36,6 +36,11 @@ const stringStates = {
   _START_ : 0,
   START_QUOTE_OR_CHAR : 1,
   ESCAPE : 2
+};
+
+const stringQuoteChar = {
+  '"' : 0,
+  "'" : 1
 };
 
 const escapes = {
@@ -103,7 +108,8 @@ function parseWhitespace(source, index, line, column) {
 function parseComment(source, index, line, column) {
   let char = source.charAt(index);
   if (char === '/') {
-    if ('/' === source.charAt(index + 1)) {
+    let next_char = source.charAt(index + 1) || '';
+    if ('/' === next_char) {
       // Unroll until the end of the line
       let first_index = index + 2, last_index = index + 2;
       index += 2;
@@ -139,9 +145,43 @@ function parseComment(source, index, line, column) {
             value: source.substring(first_index, last_index), index: index,
             line: line, column: column
       }
-    } else {
-      // Handle /* ... */
-      return null;
+    } else if ('*' === next_char) {
+      // unroll until we find */
+      let first_index = index + 2, last_index = index + 2;
+      index += 2;
+      while (index < source.length) {
+        char = source.charAt(index);
+        if (char !== '*') {
+          if (char === '\r') {
+            next_char = source.charAt(index + 1) || '';
+            line++;
+            column = 1;
+            if (next_char === '\n') {
+              index++;
+            }
+          } else if (char === '\n') {
+            line++;
+            column = 1;
+          }
+        } else {
+          next_char = source.charAt(index + 1) || '';
+          if ('/' === next_char) {
+            last_index = index;
+            if (last_index >= source.length) {
+              last_index = source.length;
+            }
+
+            return {
+              type : tokenTypes.COMMENT,
+              value : source.substring(first_index, last_index),
+              index : index + 2,
+              line : line,
+              column : column
+            };
+          }
+        }
+        index++;
+      }
     }
   } else {
     return null;

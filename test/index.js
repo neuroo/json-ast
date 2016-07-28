@@ -3,7 +3,7 @@ var path = require('path');
 var util = require('util');
 var assert = require('assert');
 var _ = require('lodash');
-var json_to_ast = require('../dist');
+var json_to_ast = require('../src');
 
 var parse = json_to_ast.parse;
 var Visitor = json_to_ast.Visitor;
@@ -41,12 +41,6 @@ describe('Test cases', function() {
   getCases('cases', function(caseName, inputFile, expectedFile) {
     it(caseName, function() {
       var parsedFile = parse(inputFile, expectedFile.options);
-      /*
-      console.log('[PARSED]',
-                  util.inspect(parsedFile, {colors : true, depth : 5}));
-      console.log('[EXPECT]',
-                  util.inspect(expectedFile.ast, {colors : true, depth : 5}));
-      */
       // Now that we include methods in each Node, a simple way to test for
       // equality is to serialize the objects.
       assert.deepEqual(JSON.stringify(parsedFile),

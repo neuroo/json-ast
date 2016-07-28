@@ -3,11 +3,12 @@
 [![Build Status](https://travis-ci.org/neuroo/json-ast.svg?branch=master)](https://travis-ci.org/neuroo/json-ast)
 
 ## History
-The original code was developed by Vlad Trushin. Breaking modifications were made by Romain Gaucher to create a less strict JSON parser.
+The original code was developed by Vlad Trushin. Breaking modifications were made by Romain Gaucher to create a less strict JSON parser, yet a more typical interaction with the AST.
 
 Current modification include:
 * Creation of a `JsonDocument` root node and [more formal AST structure](src/ast.js)
 * Support for [inline comments](test/cases/comment-in-object.json)
+* Support for [multi-line comments](test/cases/multi-line-comments-in-object.js)
 * Support for [trailing commas and many consecutive commas](test/cases/object-trailing-commas.json)
 * Include visitor pattern to visit the AST
 
@@ -18,11 +19,14 @@ The JSON parser accepts a superset of the JSON language:
 {
   "key1": "value1", // some other comments
   "key2": "value2",
+  ,
+  ,
+  /*
+    Oh dear! It's important to put this here.
+    And we love commas too!
+  */
 }
-// some more comments
 ```
-
-Some more features are under development, especially multi-line comments.
 
 ## Structure of the AST
 As of 2.1.0, the AST is defined with the following types:
