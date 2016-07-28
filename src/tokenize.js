@@ -142,8 +142,9 @@ function parseComment(source, index, line, column) {
 
       return {
         type: tokenTypes.COMMENT,
-            value: source.substring(first_index, last_index), index: index,
-            line: line, column: column
+            value: source.substring(first_index, last_index)
+                .replace(/(\r\n|\n|\r)/gm, ""),
+            index: index, line: line, column: column
       }
     } else if ('*' === next_char) {
       // unroll until we find */

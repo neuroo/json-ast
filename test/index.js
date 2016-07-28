@@ -54,6 +54,7 @@ describe('Error test cases', function() {
     it(caseName, function() {
       try {
         parse(inputFile, expectedFile.options);
+        assert(false);
       } catch (e) {
         assert.deepEqual(expectedFile.error.message, e.rawMessage,
                          'asts are not equal');

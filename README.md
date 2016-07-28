@@ -1,18 +1,23 @@
-# JSON AST parser
+# A tolerant JSON parser
 
 [![Build Status](https://travis-ci.org/neuroo/json-ast.svg?branch=master)](https://travis-ci.org/neuroo/json-ast)
 
-## History
-The original code was developed by Vlad Trushin. Breaking modifications were made by Romain Gaucher to create a less strict JSON parser, yet a more typical interaction with the AST.
+## Features
+The original code was developed by Vlad Trushin. Breaking modifications were made by [Romain Gaucher](https://twitter.com/rgaucher) to create a less strict JSON parser. Additionally, a more typical interaction with the AST has been implemented.
 
-Current modification include:
+Current modifications and features as of `2.1.2` include:
 * Creation of a `JsonDocument` root node and [more formal AST structure](src/ast.js)
 * Support for [inline comments](test/cases/comment-in-object.json)
 * Support for [multi-line comments](test/cases/multi-line-comments-in-object.js)
 * Support for [trailing commas and many consecutive commas](test/cases/object-trailing-commas.json)
 * Include visitor pattern to visit the AST
+* Include a limited error-recovery mode trying to catch (when `junker` set to `true`):
+  * [unclosed objects](test/cases/object-unclosed-junker.json) or arrays
+  * [too many closing braces](test/cases/redundant-symbols-junker.json) or brackets
 
-## Features
+[Basic examples](examples/) are available to show how to use this package.
+
+## JSONish
 The JSON parser accepts a superset of the JSON language:
 ```json
 // some comment
@@ -24,8 +29,13 @@ The JSON parser accepts a superset of the JSON language:
   /*
     Oh dear! It's important to put this here.
     And we love commas too!
+    And we're missing the closing brace...
   */
-}
+```
+
+## Install
+```shell
+npm install json-ast
 ```
 
 ## Structure of the AST
@@ -85,16 +95,20 @@ class MyVisitor extends Visitor {
 const JSON_BUFFER = `// Some comment
 {
   "key": "value"
-}`;
+`;
 
 // `verbose` will include the position in each node
-const ast = parse(JSON_BUFFER, {verbose: true});
+const ast = parse(JSON_BUFFER, {verbose: true, junker: true});
 assert(ast instanceof AST.JsonDocument);
 const visitor = new MyVisitor();
 ast.visit(visitor);
 assert.deepEqual(visitor.comments, [" Some comment"]);
 ```
 
+### Parsing Options
+The second argument of the `parse` function takes an object with the following settings:
+* `verbose`: include positions in each AST node, `true` by default
+* `junker`: enables an error recovery mode, `false` by default
 
 ## License
 MIT Vlad Trushin and Romain Gaucher

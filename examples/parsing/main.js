@@ -9,12 +9,11 @@ const SOME_JSON = `
 {
   "key1": "value1", // some other comments
   "key2": "value2"
-}
 // some more comments
 `;
 
 function parseJSON() {
-  const tree = parser(SOME_JSON, {verbose : true});
+  const tree = parser(SOME_JSON, {verbose : true, junker : true});
   assert(tree instanceof json_ast.AST.JsonDocument);
 
   console.log(util.inspect(tree, {colors : true, depth : 7}));
@@ -28,8 +27,8 @@ function parseJSON() {
        _position:
         Position {
           _start: { line: 3, column: 1, char: 17 },
-          _end: { line: 6, column: 2, char: 82 },
-          _human: '3:1 - 6:2 [17:82]' },
+          _end: { line: 3, column: 2, char: 18 },
+          _human: '3:1 - 3:2 [17:18]' },
        _properties:
         [ JsonProperty {
             _type: 'property',
@@ -81,7 +80,15 @@ function parseJSON() {
                _start: { line: 4, column: 21, char: 39 },
                _end: { line: 5, column: 1, char: 62 },
                _human: '4:21 - 5:1 [39:62]' },
-            _value: ' some other comments' } ] },
+            _value: ' some other comments' },
+          JsonComment {
+            _type: 'comment',
+            _position:
+             Position {
+               _start: { line: 6, column: 1, char: 81 },
+               _end: { line: 7, column: 1, char: 103 },
+               _human: '6:1 - 7:1 [81:103]' },
+            _value: ' some more comments' } ] },
     _comments:
      [ JsonComment {
          _type: 'comment',
@@ -90,15 +97,8 @@ function parseJSON() {
             _start: { line: 2, column: 1, char: 1 },
             _end: { line: 3, column: 1, char: 17 },
             _human: '2:1 - 3:1 [1:17]' },
-         _value: ' some comment' },
-       JsonComment {
-         _type: 'comment',
-         _position:
-          Position {
-            _start: { line: 7, column: 1, char: 83 },
-            _end: { line: 8, column: 1, char: 105 },
-            _human: '7:1 - 8:1 [83:105]' },
-         _value: ' some more comments\n' } ] }
+         _value: ' some comment' } ] }
+
   */
 }
 
