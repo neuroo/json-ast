@@ -36,6 +36,8 @@ function traverseAST(visitor, node) {
   }
   case nodeTypes.ARRAY: {
     visitor.array(node);
+    if (visitor.stop)
+      break;
     if (node.comments) {
       node.comments.forEach((commentNode) => { visitor.comment(commentNode); });
     }
@@ -46,27 +48,32 @@ function traverseAST(visitor, node) {
   }
   case nodeTypes.STRING: {
     visitor.value(node);
-    visitor.string(node);
+    if (!visitor.stop)
+      visitor.string(node);
     break;
   }
   case nodeTypes.NUMBER: {
     visitor.value(node);
-    visitor.number(node);
+    if (!visitor.stop)
+      visitor.number(node);
     break;
   }
   case nodeTypes.TRUE: {
     visitor.value(node);
-    visitor.boolean(node);
+    if (!visitor.stop)
+      visitor.boolean(node);
     break;
   }
   case nodeTypes.FALSE: {
     visitor.value(node);
-    visitor.boolean(node);
+    if (!visitor.stop)
+      visitor.boolean(node);
     break;
   }
   case nodeTypes.NULL: {
     visitor.value(node);
-    visitor.nil(node);
+    if (!visitor.stop)
+      visitor.nil(node);
     break;
   }
   default:
@@ -75,7 +82,10 @@ function traverseAST(visitor, node) {
 }
 
 export class Visitor {
-  constructor(){};
+  constructor() { this._stop = false; };
+
+  set stop(_stop) { this._stop = !!_stop; }
+  get stop() { return this._stop; }
 
   document(docNode){
       //
@@ -114,7 +124,7 @@ export class Visitor {
   };
 
   boolean(booleanNode){
-      // encapsulate true | false
+      // encapsulates true | false
   };
 
   nil(nullNode){
@@ -124,6 +134,8 @@ export class Visitor {
   // Visit
   visit(node) {
     // call to "private" function
+    if (this.stop)
+      return;
     traverseAST(this, node);
   }
 };

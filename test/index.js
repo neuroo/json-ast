@@ -89,7 +89,7 @@ class TestAccumulatorVisitor extends Visitor {
 describe('Visitor cases', function() {
   getCases('visitor-cases', function(caseName, inputFile, expectedFile) {
     it(caseName, function() {
-      const documentNode = parse(inputFile, inputFile, expectedFile);
+      const documentNode = parse(inputFile);
       const store = {};
       const accVisitor = new TestAccumulatorVisitor(store);
 
@@ -98,5 +98,41 @@ describe('Visitor cases', function() {
       assert.deepEqual(store.keys, expectedFile.visitor.keys);
       assert.deepEqual(store.values, expectedFile.visitor.values);
     });
+  });
+});
+
+class SkipAfterAKey extends Visitor {
+  constructor(store) {
+    super();
+    this._store = store;
+  }
+
+  property(propNode) {
+    const keyNode = propNode.key;
+    const valueNode = propNode.value;
+    // stop when the first prop key name has more than 2 char
+    if (keyNode.value.length > 1)
+      this.stop = true;
+  }
+
+  value(valueNode) { this._store.push(valueNode.value); }
+};
+
+describe('Visitor pattern', function() {
+  it('should stop traversal when the user decides to', function() {
+    const JSON_TESTCASE = `{
+      "a": 1,
+      "b": {
+        "ba": 2
+      },
+      "c": 3,
+    }`;
+
+    const documentNode = parse(JSON_TESTCASE);
+    const store = [];
+    const accVisitor = new SkipAfterAKey(store);
+
+    documentNode.accept(accVisitor);
+    assert.deepEqual(store, [ '1' ]);
   });
 });

@@ -5,7 +5,7 @@
 ## Features
 The original code was developed by Vlad Trushin. Breaking modifications were made by [Romain Gaucher](https://twitter.com/rgaucher) to create a less strict JSON parser. Additionally, a more typical interaction with the AST has been implemented.
 
-Current modifications and features as of `2.1.2` include:
+Current modifications and features as of `2.1.3` include:
 * Creation of a `JsonDocument` root node and [more formal AST structure](src/ast.js)
 * Support for [inline comments](test/cases/comment-in-object.json)
 * Support for [multi-line comments](test/cases/multi-line-comments-in-object.js)
@@ -80,7 +80,7 @@ All the types exists in [src/ast.js](src/ast.js).
 ```javascript
 import {parse, Visitor, AST} from 'json-ast';
 
-
+// The visitor can stop at any time by assigning `Visitor.stop = true`
 class MyVisitor extends Visitor {
   constructor() {
     super();
