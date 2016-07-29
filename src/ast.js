@@ -1,3 +1,5 @@
+import assert from 'assert';
+
 export const nodeTypes = {
   DOCUMENT : 'document',
   COMMENT : 'comment',
@@ -32,6 +34,8 @@ export class JsonNode {
   static toObject(jsonNode) { return JSON.parse(JSON.stringify(jsonNode)); }
 
   static toString(jsonNode) { return JSON.stringify(jsonNode); }
+
+  static toJSON(jsonNode) { return toJSON(jsonNode); }
 };
 
 export class JsonDocument extends JsonNode {
@@ -139,7 +143,7 @@ const nodeTypeObjectMapping = {
   [nodeTypes.NUMBER] : JsonNumber,
   [nodeTypes.TRUE] : JsonTrue,
   [nodeTypes.FALSE] : JsonFalse,
-  [nodeTypes.NULL] : JsonNumber
+  [nodeTypes.NULL] : JsonNull
 };
 
 //
@@ -154,4 +158,53 @@ export class NodeFactory {
       throw new Error(`AST node of type ${objectType} cannot be found`);
     return _value !== null ? new clazz(_value) : new clazz();
   }
+}
+
+function toJSON(jsonNode) {
+  assert(jsonNode instanceof JsonNode,
+         'JSON conversion only accepts a kind of JsonNode');
+
+  // Just a recursive, slow implementation to a JavaScript object from this
+  // JsonNode
+  function recursiveNodeConversion(rootNode, parentObject) {
+    let result = null;
+    switch (rootNode.type) {
+    case nodeTypes.DOCUMENT:
+      return recursiveNodeConversion(rootNode.child);
+    case nodeTypes.OBJECT: {
+      result = {};
+      rootNode.properties.forEach((propNode) => {
+        result[recursiveNodeConversion(propNode.key)] =
+            recursiveNodeConversion(propNode.value);
+      });
+      return result;
+    }
+    case nodeTypes.ARRAY: {
+      result = [];
+      rootNode.items.forEach(
+          (itemNode) => { result.push(recursiveNodeConversion(itemNode)); });
+      return result;
+    }
+    case nodeTypes.VALUE:
+    case nodeTypes.STRING:
+    case nodeTypes.KEY:
+      return rootNode.value;
+    case nodeTypes.NUMBER: {
+      // typecast
+      if (rootNode.value instanceof Number)
+        return rootNode.value;
+      return (new Number(rootNode.value)).valueOf();
+    }
+    case nodeTypes.TRUE:
+      return true;
+    case nodeTypes.FALSE:
+      return false;
+    case nodeTypes.NULL:
+      return null;
+    default:
+      return undefined;
+    }
+  }
+
+  return recursiveNodeConversion(jsonNode);
 }

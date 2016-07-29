@@ -7,6 +7,7 @@ var json_to_ast = require('../src');
 
 var parse = json_to_ast.parse;
 var Visitor = json_to_ast.Visitor;
+var AST = json_to_ast.AST;
 
 function readFile(file) {
   var src = fs.readFileSync(file, 'utf8');
@@ -136,3 +137,38 @@ describe('Visitor pattern', function() {
     assert.deepEqual(store, [ '1' ]);
   });
 });
+
+describe('Object conversion to native JSON', function() {
+  it('should convert properly basic structures', function() {
+    const JSON_TESTCASE = {
+      "a" : 1,
+      "b" : {"ba" : 2},
+      "c" : 3,
+      "d" : {
+        "da" : [ 1, 2, 3, "4" ],
+        "db" :
+            {"true" : true, "false" : false, "float" : -1.0223, "null" : null},
+        "dc" : [
+          {
+            "true" : true,
+            "false" : false,
+            "float" : -15345345.0223,
+            "null" : null
+          },
+          {
+            "true" : true,
+            "false" : false,
+            "float" : -1.0233323,
+            "null" : null
+          }
+        ]
+      },
+      "e" : null
+    };
+
+    const NORMAL_JSON_BUFFER = JSON.stringify(JSON_TESTCASE);
+    const documentNode = parse(NORMAL_JSON_BUFFER);
+
+    assert.deepEqual(JSON_TESTCASE, AST.JsonNode.toJSON(documentNode));
+  });
+})

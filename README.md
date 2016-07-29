@@ -5,7 +5,7 @@
 ## Features
 The original code was developed by Vlad Trushin. Breaking modifications were made by [Romain Gaucher](https://twitter.com/rgaucher) to create a less strict JSON parser. Additionally, a more typical interaction with the AST has been implemented.
 
-Current modifications and features as of `2.1.3` include:
+Current modifications and features as of `2.1.4` include:
 * Creation of a `JsonDocument` root node and [more formal AST structure](src/ast.js)
 * Support for [inline comments](test/cases/comment-in-object.json)
 * Support for [multi-line comments](test/cases/multi-line-comments-in-object.js)
@@ -14,6 +14,7 @@ Current modifications and features as of `2.1.3` include:
 * Include a limited error-recovery mode trying to catch (when `junker` set to `true`):
   * [unclosed objects](test/cases/object-unclosed-junker.json) or arrays
   * [too many closing braces](test/cases/redundant-symbols-junker.json) or brackets
+* [Conversion to a native JavaScript object](test/index.js#L172) from `JsonNode`
 
 [Basic examples](examples/) are available to show how to use this package.
 
@@ -100,9 +101,14 @@ const JSON_BUFFER = `// Some comment
 // `verbose` will include the position in each node
 const ast = parse(JSON_BUFFER, {verbose: true, junker: true});
 assert(ast instanceof AST.JsonDocument);
+
 const visitor = new MyVisitor();
 ast.visit(visitor);
 assert.deepEqual(visitor.comments, [" Some comment"]);
+
+// One can also the `JsonNode.toJSON` static method to convert to a JavaScript object
+const obj = JsonNode.toJSON(ast);
+assert(obj.key === 'value');
 ```
 
 ### Parsing Options
