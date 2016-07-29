@@ -1,5 +1,3 @@
-import assert from 'assert';
-
 export const nodeTypes = {
   DOCUMENT : 'document',
   COMMENT : 'comment',
@@ -161,8 +159,8 @@ export class NodeFactory {
 }
 
 function toJSON(jsonNode) {
-  assert(jsonNode instanceof JsonNode,
-         'JSON conversion only accepts a kind of JsonNode');
+  if (!(jsonNode instanceof JsonNode))
+    throw new Error('JSON conversion only accepts a kind of JsonNode');
 
   // Just a recursive, slow implementation to a JavaScript object from this
   // JsonNode
