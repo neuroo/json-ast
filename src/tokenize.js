@@ -14,7 +14,8 @@ export const tokenTypes = {
   NUMBER : 'NUMBER',               //
   TRUE : 'TRUE',                   // true
   FALSE : 'FALSE',                 // false
-  NULL : 'NULL'                    // null
+  NULL : 'NULL',                   // null
+  IDENTIFIER : 'IDENTIFIER',       // identifiers
 };
 
 const charTokens = {
@@ -71,6 +72,10 @@ const numberStates = {
 function isDigit1to9(char) { return char >= '1' && char <= '9'; }
 
 function isDigit(char) { return char >= '0' && char <= '9'; }
+
+function isLetter(char) {
+  return (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z');
+}
 
 function isHex(char) {
   return isDigit(char) || (char >= 'a' && char <= 'f') ||
@@ -216,6 +221,33 @@ function parseKeyword(source, index, line, column) {
       index : index + matched.length,
       value : null
     };
+  } else {
+    return null;
+  }
+}
+
+function parseIdentifier(source, index, line, column) {
+  const startIndex = index;
+  let buffer = '';
+
+  // Must start with a letter or underscore
+  const firstChar = source.charAt(index);
+  if (!(isLetter(firstChar) || firstChar === '_'))
+    return null;
+
+  while (index < source.length) {
+    const char = source.charAt(index);
+    if (!(isLetter(char) || char === '_' || isDigit(char)))
+      break;
+    buffer += char;
+    index++;
+  }
+
+  if (buffer.length > 0) {
+    return {
+      type: tokenTypes.IDENTIFIER, line: line,
+          column: column + index - startIndex, index: index, value: buffer
+    }
   } else {
     return null;
   }
@@ -419,6 +451,7 @@ export function tokenize(source, settings) {
     let matched = parseComment(source, index, line, column) ||
                   parseChar(source, index, line, column) ||
                   parseKeyword(source, index, line, column) ||
+                  parseIdentifier(source, index, line, column) ||
                   parseString(source, index, line, column) ||
                   parseNumber(source, index, line, column);
 

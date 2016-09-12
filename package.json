@@ -1,6 +1,6 @@
 {
   "name": "json-ast",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "description": "JSON parser AST utilities",
   "author": "Romain Gaucher",
   "homepage": "https://github.com/neuroo/json-ast",
