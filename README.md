@@ -6,19 +6,19 @@
 The original code was developed by Vlad Trushin. Breaking modifications were made by [Romain Gaucher](https://twitter.com/rgaucher) to create a less strict JSON parser. Additionally, a more typical interaction with the AST has been implemented.
 
 Current modifications and features as of `2.1.6` include:
-* Creation of a `JsonDocument` root node and [more formal AST structure](src/ast.js)
-* Support for [inline comments](test/cases/comment-in-object.json)
-* Support for [multi-line comments](test/cases/multi-line-comments-in-object.js)
-* Support for [trailing commas and many consecutive commas](test/cases/object-trailing-commas.json)
+* Creation of a `JsonDocument` root node and [more formal AST structure](./src/ast.js)
+* Support for [inline comments](./test/cases/comment-in-object.json)
+* Support for [multi-line comments](./test/cases/multi-line-comments-in-object.js)
+* Support for [trailing commas and many consecutive commas](./test/cases/object-trailing-commas.json)
 * Include visitor pattern to visit the AST
 * Include a limited error-recovery mode trying to catch (when `junker` set to `true`):
-  * [unclosed objects](test/cases/object-unclosed-junker.json) or arrays
-  * [too many closing braces](test/cases/redundant-symbols-junker.json) or brackets
-  * [automatic comma injection](test/cases/asi-junker.json)
-  * support for [unquoted keys](test/cases/unquoted-keys-junker.json)
-* [Conversion to a native JavaScript object](test/index.js#L172) from `JsonNode`
+  * [unclosed objects](./test/cases/object-unclosed-junker.json) or arrays
+  * [too many closing braces](./test/cases/redundant-symbols-junker.json) or brackets
+  * [automatic comma injection](./test/cases/asi-junker.json)
+  * support for [unquoted keys](./test/cases/unquoted-keys-junker.json)
+* [Conversion to a native JavaScript object](./test/index.js#L172) from `JsonNode`
 
-[Basic examples](examples/) are available to show how to use this package.
+[Basic examples](./examples/) are available to show how to use this package.
 
 ## JSONish
 The JSON parser accepts a superset of the JSON language:
