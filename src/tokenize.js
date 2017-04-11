@@ -56,6 +56,11 @@ const escapes = {
   'u' : 8   // 4 hexadecimal digits
 };
 
+// Support regex
+['d', 'D', 'w', 'W', 's', 'S'].forEach((d, i) => {
+  escapes[d] = i;
+});
+
 const numberStates = {
   _START_ : 0,
   MINUS : 1,
