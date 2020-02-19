@@ -24,3 +24,9 @@ jobs:
         run: npm ci
       - name: Test
         run: npm test
+      - name: Build
+        run: npm run build
+      - name: Run examples
+        run: |
+          node examples/parsing/main.js
+          node examples/visit/main.js
