@@ -1,27 +1,31 @@
 # A tolerant JSON parser
 
-[![Build Status](https://travis-ci.org/neuroo/json-ast.svg?branch=master)](https://travis-ci.org/neuroo/json-ast)
+![Test](https://github.com/anchan828/json-ast/workflows/Test/badge.svg)
 
 ## Features
+
 The original code was developed by Vlad Trushin. Breaking modifications were made by [Romain Gaucher](https://twitter.com/rgaucher) to create a less strict JSON parser. Additionally, a more typical interaction with the AST has been implemented.
 
 Current modifications and features as of `2.1.6` include:
-* Creation of a `JsonDocument` root node and [more formal AST structure](./src/ast.js)
-* Support for [inline comments](./test/cases/comment-in-object.json)
-* Support for [multi-line comments](./test/cases/multi-line-comments-in-object.js)
-* Support for [trailing commas and many consecutive commas](./test/cases/object-trailing-commas.json)
-* Include visitor pattern to visit the AST
-* Include a limited error-recovery mode trying to catch (when `junker` set to `true`):
-  * [unclosed objects](./test/cases/object-unclosed-junker.json) or arrays
-  * [too many closing braces](./test/cases/redundant-symbols-junker.json) or brackets
-  * [automatic comma injection](./test/cases/asi-junker.json)
-  * support for [unquoted keys](./test/cases/unquoted-keys-junker.json)
-* [Conversion to a native JavaScript object](./test/index.js#L172) from `JsonNode`
+
+- Creation of a `JsonDocument` root node and [more formal AST structure](./src/ast.js)
+- Support for [inline comments](./test/cases/comment-in-object.json)
+- Support for [multi-line comments](./test/cases/multi-line-comments-in-object.js)
+- Support for [trailing commas and many consecutive commas](./test/cases/object-trailing-commas.json)
+- Include visitor pattern to visit the AST
+- Include a limited error-recovery mode trying to catch (when `junker` set to `true`):
+  - [unclosed objects](./test/cases/object-unclosed-junker.json) or arrays
+  - [too many closing braces](./test/cases/redundant-symbols-junker.json) or brackets
+  - [automatic comma injection](./test/cases/asi-junker.json)
+  - support for [unquoted keys](./test/cases/unquoted-keys-junker.json)
+- [Conversion to a native JavaScript object](./test/index.js#L172) from `JsonNode`
 
 [Basic examples](./examples/) are available to show how to use this package.
 
 ## JSONish
+
 The JSON parser accepts a superset of the JSON language:
+
 ```json
 // some comment
 {
@@ -37,11 +41,13 @@ The JSON parser accepts a superset of the JSON language:
 ```
 
 ## Install
+
 ```shell
 npm install json-ast
 ```
 
 ## Structure of the AST
+
 As of 2.1.0, the AST is defined with the following types:
 
 ```javascript
@@ -80,8 +86,9 @@ As of 2.1.0, the AST is defined with the following types:
 All the types exists in [src/ast.js](src/ast.js).
 
 ## API
+
 ```javascript
-import {parse, Visitor, AST} from 'json-ast';
+import { parse, Visitor, AST } from "json-ast";
 
 // The visitor can stop at any time by assigning `Visitor.stop = true`
 class MyVisitor extends Visitor {
@@ -93,7 +100,7 @@ class MyVisitor extends Visitor {
   comment(commentNode) {
     this.comments.push(commentNode.value);
   }
-};
+}
 
 const JSON_BUFFER = `// Some comment
 {
@@ -101,7 +108,7 @@ const JSON_BUFFER = `// Some comment
 `;
 
 // `verbose` will include the position in each node
-const ast = parse(JSON_BUFFER, {verbose: true, junker: true});
+const ast = parse(JSON_BUFFER, { verbose: true, junker: true });
 assert(ast instanceof AST.JsonDocument);
 
 const visitor = new MyVisitor();
@@ -110,13 +117,16 @@ assert.deepEqual(visitor.comments, [" Some comment"]);
 
 // One can also the `JsonNode.toJSON` static method to convert to a JavaScript object
 const obj = JsonNode.toJSON(ast);
-assert(obj.key === 'value');
+assert(obj.key === "value");
 ```
 
 ### Parsing Options
+
 The second argument of the `parse` function takes an object with the following settings:
-* `verbose`: include positions in each AST node, `true` by default
-* `junker`: enables an error recovery mode, `false` by default
+
+- `verbose`: include positions in each AST node, `true` by default
+- `junker`: enables an error recovery mode, `false` by default
 
 ## License
+
 MIT Vlad Trushin and Romain Gaucher
