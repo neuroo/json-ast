@@ -2,6 +2,12 @@
 
 ![Test](https://github.com/anchan828/json-ast/workflows/Test/badge.svg)
 
+## Install
+
+```
+npm i @anchan828/json-ast
+```
+
 ## Features
 
 The original code was developed by Vlad Trushin. Breaking modifications were made by [Romain Gaucher](https://twitter.com/rgaucher) to create a less strict JSON parser. Additionally, a more typical interaction with the AST has been implemented.
