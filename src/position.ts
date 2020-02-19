@@ -4,7 +4,7 @@ interface PositionLocation {
   char: number;
 }
 
-export default class Position {
+export class JsonPosition {
   constructor(
     private readonly startLine: number,
     private readonly startColumn: number,

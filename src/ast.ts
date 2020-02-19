@@ -1,4 +1,4 @@
-import Position from "./position";
+import { JsonPosition } from "./position";
 
 export enum nodeTypes {
   DOCUMENT = "document",
@@ -19,7 +19,7 @@ export enum nodeTypes {
 // All elements in the tree will extend the `JsonNode` base class
 export class JsonNode {
   private readonly _type: nodeTypes;
-  public position: Position = null;
+  public position: JsonPosition = null;
   constructor(_type = nodeTypes.ERROR) {
     this._type = _type || nodeTypes.ERROR;
   }

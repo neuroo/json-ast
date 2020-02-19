@@ -13,9 +13,9 @@ import {
 import error from "./error";
 import { junker } from "./junker";
 import parseErrorTypes from "./parseErrorTypes";
-import Position from "./position";
+import { JsonPosition } from "./position";
 import { tokenize, tokenTypes } from "./tokenize";
-import { ParseResult, ParseSettings } from "./types";
+import { JsonToken, ParseResult, ParseSettings } from "./types";
 
 // import util from 'util';
 
@@ -42,7 +42,7 @@ const defaultSettings: ParseSettings = {
 
 function parseObject(
   source: string,
-  tokenList,
+  tokenList: JsonToken[],
   index: number,
   settings: ParseSettings
 ): ParseResult<JsonObject> {
@@ -95,7 +95,7 @@ function parseObject(
           index++;
         } else if (token.type === tokenTypes.RIGHT_BRACE) {
           if (settings.verbose) {
-            object.position = new Position(
+            object.position = new JsonPosition(
               startToken.position.start.line,
               startToken.position.start.column,
               startToken.position.start.char,
@@ -156,7 +156,7 @@ function parseObject(
       case objectStates.VALUE:
         if (token.type === tokenTypes.RIGHT_BRACE) {
           if (settings.verbose) {
-            object.position = new Position(
+            object.position = new JsonPosition(
               startToken.position.start.line,
               startToken.position.start.column,
               startToken.position.start.char,
@@ -232,7 +232,7 @@ function parseObject(
 
 function parseArray(
   source: string,
-  tokenList,
+  tokenList: JsonToken[],
   index: number,
   settings: ParseSettings
 ): ParseResult<JsonArray> {
@@ -269,7 +269,7 @@ function parseArray(
       case arrayStates.OPEN_ARRAY:
         if (token.type === tokenTypes.RIGHT_BRACKET) {
           if (settings.verbose) {
-            array.position = new Position(
+            array.position = new JsonPosition(
               startToken.position.start.line,
               startToken.position.start.column,
               startToken.position.start.char,
@@ -291,7 +291,7 @@ function parseArray(
       case arrayStates.VALUE:
         if (token.type === tokenTypes.RIGHT_BRACKET) {
           if (settings.verbose) {
-            array.position = new Position(
+            array.position = new JsonPosition(
               startToken.position.start.line,
               startToken.position.start.column,
               startToken.position.start.char,
@@ -344,7 +344,7 @@ function parseArray(
 
 function parseValue(
   source: string,
-  tokenList,
+  tokenList: JsonToken[],
   index: number,
   settings: ParseSettings
 ): ParseResult<JsonValue | JsonObject | JsonArray> {
@@ -405,7 +405,7 @@ function parseValue(
 
 function parseDocument(
   source: string,
-  tokenList,
+  tokenList: JsonToken[],
   index: number,
   settings: ParseSettings
 ): ParseResult<JsonDocument> {
@@ -462,7 +462,7 @@ function parseDocument(
   return { value: doc, index: final_index };
 }
 
-export function parse(source, settings?: ParseSettings): JsonDocument {
+export function parse(source: string, settings?: ParseSettings): JsonDocument {
   settings = Object.assign({}, defaultSettings, settings);
 
   let tokenList = tokenize(source, settings);

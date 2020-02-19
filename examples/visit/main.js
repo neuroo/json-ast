@@ -1,6 +1,6 @@
 const assert = require("assert");
 
-const { Visitor, parse, AST } = require("../../dist");
+const { Visitor, parse, JsonKey, JsonDocument } = require("../../dist");
 
 class MyVisitor extends Visitor {
   constructor() {
@@ -8,7 +8,7 @@ class MyVisitor extends Visitor {
   }
 
   key(keyNode) {
-    assert(keyNode instanceof AST.JsonKey);
+    assert(keyNode instanceof JsonKey);
     console.log("[KEY]", keyNode.value);
   }
 }
@@ -24,7 +24,7 @@ const SOME_JSON = `
 
 function visitJSON() {
   const tree = parse(SOME_JSON, { verbose: true });
-  assert(tree instanceof AST.JsonDocument);
+  assert(tree instanceof JsonDocument);
 
   const visitor = new MyVisitor();
   tree.accept(visitor);

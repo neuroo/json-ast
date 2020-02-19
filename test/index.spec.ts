@@ -106,7 +106,6 @@ class SkipAfterAKey extends Visitor {
 
   property(propNode) {
     const keyNode = propNode.key;
-    const valueNode = propNode.value;
     // stop when the first prop key name has more than 2 char
     if (keyNode.value.length > 1) this.stop = true;
   }

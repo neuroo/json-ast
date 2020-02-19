@@ -1,5 +1,5 @@
 const util = require("util");
-const { AST, parse } = require("../../dist");
+const { parse, JsonDocument } = require("../../dist");
 const assert = require("assert");
 
 const SOME_JSON = `
@@ -12,7 +12,7 @@ const SOME_JSON = `
 
 function parseJSON() {
   const tree = parse(SOME_JSON, { verbose: true, junker: true });
-  assert(tree instanceof AST.JsonDocument);
+  assert(tree instanceof JsonDocument);
 
   console.log(util.inspect(tree, { colors: true, depth: 7 }));
   /*

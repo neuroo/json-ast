@@ -1,5 +1,5 @@
 import * as AST from "../src/ast";
-import Position from "../src/position";
+import { JsonPosition } from "../src/position";
 
 export function position(
   startLine,
@@ -9,7 +9,7 @@ export function position(
   endColumn,
   endChar
 ) {
-  return new Position(
+  return new JsonPosition(
     startLine,
     startColumn,
     startChar,

@@ -1,5 +1,6 @@
 // import util from 'util';
 import { tokenTypes } from "./tokenize";
+import { JsonToken, ParseSettings } from "./types";
 
 function findLastTokenIndexIn(tokenList, tokenTypes) {
   let rindex = tokenList.length - 1;
@@ -16,7 +17,7 @@ function findLastTokenIndexIn(tokenList, tokenTypes) {
 
 // Only called when the junker settings is set to true. It balances the
 // arrays/objects so there is no extra tokens left in the list.
-function balancer(tokenList, settings) {
+function balancer(tokenList: JsonToken[], settings: ParseSettings) {
   let token = null;
   let index = 0;
   const max_index = tokenList.length;
@@ -151,7 +152,7 @@ const TOKEN_TERMINALS = [
 ];
 
 // Returns true if two consecutive terminals are found in the JSON
-function is_double_value_pattern(tokenList, index) {
+function is_double_value_pattern(tokenList: JsonToken[], index: number) {
   if (index >= tokenList.length - 1) return false;
   let currentToken = tokenList[index];
   let nextToken = tokenList[index + 1];
@@ -164,7 +165,7 @@ function is_double_value_pattern(tokenList, index) {
 const RIGHT_BRACE_BRACKETS = [tokenTypes.RIGHT_BRACKET, tokenTypes.RIGHT_BRACE];
 const LEFT_BRACE_BRACKETS = [tokenTypes.LEFT_BRACKET, tokenTypes.LEFT_BRACE];
 
-function is_confused_terminators(tokenList, index) {
+function is_confused_terminators(tokenList: JsonToken[], index: number) {
   if (index >= tokenList.length - 1) return false;
   let currentToken = tokenList[index];
   let nextToken = tokenList[index + 1];
@@ -175,7 +176,7 @@ function is_confused_terminators(tokenList, index) {
   );
 }
 
-function is_terminator_and_value(tokenList, index) {
+function is_terminator_and_value(tokenList: JsonToken[], index: number) {
   if (index >= tokenList.length - 1) return false;
   let currentToken = tokenList[index];
   let nextToken = tokenList[index + 1];
@@ -186,7 +187,7 @@ function is_terminator_and_value(tokenList, index) {
   );
 }
 
-function comma_injection(tokenList, settings) {
+function comma_injection(tokenList: JsonToken[], settings: ParseSettings) {
   let newTokenList = [];
   var token = null;
   var index = 0;
@@ -221,7 +222,7 @@ function comma_injection(tokenList, settings) {
 }
 
 // Quote identifiers taht seem to be used as keys
-function quote_keys(tokenList, settings) {
+function quote_keys(tokenList: JsonToken[], settings: ParseSettings) {
   let newTokenList = [];
   var token = null;
   var index = 0;
@@ -253,7 +254,7 @@ const JUNKER_PROCESSES = [
 
 // Running all the junker processes. These are responsible for achieving one
 // specific thing.
-export function junker(tokenList, settings) {
+export function junker(tokenList: JsonToken[], settings: ParseSettings) {
   if (settings.junker === false) return tokenList;
   var resultTokens = tokenList;
   for (var i = 0; i < JUNKER_PROCESSES.length; i++) {

@@ -1,7 +1,7 @@
 import error from "./error";
-import Position from "./position";
+import { JsonPosition } from "./position";
 import tokenizeErrorTypes from "./tokenizeErrorTypes";
-import { ParseSettings } from "./types";
+import { JsonToken, ParseSettings } from "./types";
 
 export const tokenTypes = {
   COMMENT: "COMMENT", // // ... \n\r? or /* ... */
@@ -496,13 +496,16 @@ const defaultSettings = {
   verbose: true
 };
 
-export function tokenize(source: string, settings?: ParseSettings) {
+export function tokenize(
+  source: string,
+  settings?: ParseSettings
+): JsonToken[] {
   settings = Object.assign({}, defaultSettings, settings);
 
   let line = 1;
   let column = 1;
   let index = 0;
-  let tokens = [];
+  let tokens: JsonToken[] = [];
   const sourceLength = source.length;
   while (index < sourceLength) {
     let whitespace = parseWhitespace(source, index, line, column);
@@ -522,14 +525,10 @@ export function tokenize(source: string, settings?: ParseSettings) {
       parseString(source, index, line, column) ||
       parseNumber(source, index, line, column);
     if (matched) {
-      let token = { type: matched.type, value: matched.value } as {
-        type: any;
-        value: any;
-        position?: Position;
-      };
+      let token = { type: matched.type, value: matched.value } as JsonToken;
 
       if (settings.verbose) {
-        token.position = new Position(
+        token.position = new JsonPosition(
           line,
           column,
           index,
