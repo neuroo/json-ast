@@ -8,10 +8,10 @@ export default class Position {
   constructor(
     private readonly startLine: number,
     private readonly startColumn: number,
-    private readonly startChar: string,
+    private readonly startChar: number,
     private readonly endLine: number,
     private readonly endColumn: number,
-    private readonly endChar: string
+    private readonly endChar: number
   ) {}
 
   get start() {
