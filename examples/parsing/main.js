@@ -1,8 +1,6 @@
-const fs = require('fs');
-const util = require('util');
-const json_ast = require('../../dist');
-const assert = require('assert');
-const parser = json_ast.parse;
+const util = require("util");
+const { AST, parse } = require("../../dist");
+const assert = require("assert");
 
 const SOME_JSON = `
 // some comment
@@ -13,10 +11,10 @@ const SOME_JSON = `
 `;
 
 function parseJSON() {
-  const tree = parser(SOME_JSON, {verbose : true, junker : true});
-  assert(tree instanceof json_ast.AST.JsonDocument);
+  const tree = parse(SOME_JSON, { verbose: true, junker: true });
+  assert(tree instanceof AST.JsonDocument);
 
-  console.log(util.inspect(tree, {colors : true, depth : 7}));
+  console.log(util.inspect(tree, { colors: true, depth: 7 }));
   /*
   JsonDocument {
     _type: 'document',

@@ -1,3 +1,5 @@
+import Position from "./position";
+
 export enum nodeTypes {
   DOCUMENT = "document",
   COMMENT = "comment",

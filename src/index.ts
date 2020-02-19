@@ -1,4 +1,3 @@
-// clang-format off
 import {
   JsonArray,
   JsonComment,
@@ -12,17 +11,13 @@ import {
   JsonProperty,
   JsonString,
   JsonTrue,
-  JsonValue,
-  nodeTypes
+  JsonValue
 } from "./ast";
-// clang-format on
-import { parse } from "./parse";
-import { Visitor } from "./visitor";
+export { nodeTypes } from "./ast";
+export { parse } from "./parse";
+export { Visitor } from "./visitor";
 
-module.exports.nodeTypes = nodeTypes;
-module.exports.parse = parse;
-module.exports.Visitor = Visitor;
-module.exports.AST = {
+export const AST = {
   JsonArray,
   JsonComment,
   JsonDocument,
