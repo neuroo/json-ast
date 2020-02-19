@@ -1,4 +1,4 @@
-import {
+export {
   JsonArray,
   JsonComment,
   JsonDocument,
@@ -11,24 +11,8 @@ import {
   JsonProperty,
   JsonString,
   JsonTrue,
-  JsonValue
+  JsonValue,
+  nodeTypes
 } from "./ast";
-export { nodeTypes } from "./ast";
 export { parse } from "./parse";
 export { Visitor } from "./visitor";
-
-module.exports.AST = {
-  JsonArray,
-  JsonComment,
-  JsonDocument,
-  JsonFalse,
-  JsonKey,
-  JsonNode,
-  JsonNull,
-  JsonNumber,
-  JsonObject,
-  JsonProperty,
-  JsonString,
-  JsonTrue,
-  JsonValue
-};
