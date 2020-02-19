@@ -4,8 +4,8 @@
 
 ## Install
 
-```
-npm i @anchan828/json-ast
+```shell
+npm install @anchan828/json-ast
 ```
 
 ## Features
@@ -46,12 +46,6 @@ The JSON parser accepts a superset of the JSON language:
   */
 ```
 
-## Install
-
-```shell
-npm install json-ast
-```
-
 ## Structure of the AST
 
 As of 2.1.0, the AST is defined with the following types:
@@ -89,7 +83,7 @@ As of 2.1.0, the AST is defined with the following types:
 [JsonNumber] extends [JsonValue]
 ```
 
-All the types exists in [src/ast.js](src/ast.js).
+All the types exists in [src/ast.ts](src/ast.ts).
 
 ## API
 
@@ -98,12 +92,9 @@ import { parse, Visitor, AST } from "json-ast";
 
 // The visitor can stop at any time by assigning `Visitor.stop = true`
 class MyVisitor extends Visitor {
-  constructor() {
-    super();
-    this.comments = [];
-  }
+  private comments: string[] = []
 
-  comment(commentNode) {
+  public comment(commentNode: JsonComment): void {
     this.comments.push(commentNode.value);
   }
 }
@@ -115,14 +106,14 @@ const JSON_BUFFER = `// Some comment
 
 // `verbose` will include the position in each node
 const ast = parse(JSON_BUFFER, { verbose: true, junker: true });
-assert(ast instanceof AST.JsonDocument);
+assert(ast instanceof JsonDocument);
 
 const visitor = new MyVisitor();
 ast.visit(visitor);
 assert.deepEqual(visitor.comments, [" Some comment"]);
 
 // One can also the `JsonNode.toJSON` static method to convert to a JavaScript object
-const obj = JsonNode.toJSON(ast);
+const obj = toJSON(ast);
 assert(obj.key === "value");
 ```
 
@@ -135,4 +126,4 @@ The second argument of the `parse` function takes an object with the following s
 
 ## License
 
-MIT Vlad Trushin and Romain Gaucher
+MIT Vlad Trushin and Romain Gaucher and anchan828
