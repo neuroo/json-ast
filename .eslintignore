@@ -1,0 +1,5 @@
+compodoc
+coverage
+dist
+node_modules
+scripts

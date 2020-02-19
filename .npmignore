@@ -1,2 +1,3 @@
-examples/
-.travis.yml
+*
+dist/*.tsbuildinfo
+!dist/**/*
