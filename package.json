@@ -37,6 +37,7 @@
     "README.md"
   ],
   "scripts": {
+    "prepublishOnly": "rm -rf dist && npm run build && rm -f dist/*.tsbuildinfo",
     "build": "tsc",
     "test": "jest"
   },
