@@ -1,6 +1,7 @@
 import error from "./error";
 import Position from "./position";
 import tokenizeErrorTypes from "./tokenizeErrorTypes";
+import { ParseSettings } from "./types";
 
 export const tokenTypes = {
   COMMENT: "COMMENT", // // ... \n\r? or /* ... */
@@ -74,19 +75,19 @@ const numberStates = {
 
 // HELPERS
 
-function isDigit1to9(char) {
+function isDigit1to9(char): boolean {
   return char >= "1" && char <= "9";
 }
 
-function isDigit(char) {
+function isDigit(char): boolean {
   return char >= "0" && char <= "9";
 }
 
-function isLetter(char) {
+function isLetter(char): boolean {
   return (char >= "a" && char <= "z") || (char >= "A" && char <= "Z");
 }
 
-function isHex(char) {
+function isHex(char): boolean {
   return (
     isDigit(char) ||
     (char >= "a" && char <= "f") ||
@@ -94,13 +95,18 @@ function isHex(char) {
   );
 }
 
-function isExp(char) {
+function isExp(char): boolean {
   return char === "e" || char === "E";
 }
 
 // PARSERS
 
-function parseWhitespace(source, index, line, column) {
+function parseWhitespace(
+  source: string,
+  index: number,
+  line: number,
+  column: number
+) {
   const char = source.charAt(index);
 
   if (char === "\r") {
@@ -127,7 +133,12 @@ function parseWhitespace(source, index, line, column) {
   return { index, line, column };
 }
 
-function parseComment(source, index, line, column) {
+function parseComment(
+  source: string,
+  index: number,
+  line: number,
+  column: number
+) {
   const sourceLength = source.length;
   let char = source.charAt(index);
   if (char === "/") {
@@ -219,7 +230,12 @@ function parseComment(source, index, line, column) {
   }
 }
 
-function parseChar(source, index, line, column) {
+function parseChar(
+  source: string,
+  index: number,
+  line: number,
+  column: number
+) {
   const char = source.charAt(index);
   if (char in charTokens) {
     return {
@@ -234,7 +250,12 @@ function parseChar(source, index, line, column) {
   }
 }
 
-function parseKeyword(source, index, line, column) {
+function parseKeyword(
+  source: string,
+  index: number,
+  line: number,
+  column: number
+) {
   const matched = Object.keys(keywordsTokens).find(
     name => name === source.substr(index, name.length)
   );
@@ -252,7 +273,12 @@ function parseKeyword(source, index, line, column) {
   }
 }
 
-function parseIdentifier(source, index, line, column) {
+function parseIdentifier(
+  source: string,
+  index: number,
+  line: number,
+  column: number
+) {
   const sourceLength = source.length;
   const startIndex = index;
   let buffer = "";
@@ -281,7 +307,12 @@ function parseIdentifier(source, index, line, column) {
   }
 }
 
-function parseString(source, index, line, column) {
+function parseString(
+  source: string,
+  index: number,
+  line: number,
+  column: number
+) {
   const sourceLength = source.length;
   const startIndex = index;
   let buffer = "";
@@ -343,7 +374,12 @@ function parseString(source, index, line, column) {
   }
 }
 
-function parseNumber(source, index, line, column) {
+function parseNumber(
+  source: string,
+  index: number,
+  line: number,
+  column: number
+) {
   const sourceLength = source.length;
   const startIndex = index;
   let passedValueIndex = index;
@@ -460,7 +496,7 @@ const defaultSettings = {
   verbose: true
 };
 
-export function tokenize(source, settings?: any) {
+export function tokenize(source: string, settings?: ParseSettings) {
   settings = Object.assign({}, defaultSettings, settings);
 
   let line = 1;

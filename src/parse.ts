@@ -1,9 +1,21 @@
-import { JsonNode, NodeFactory, nodeTypes } from "./ast";
+import {
+  JsonArray,
+  JsonComment,
+  JsonDocument,
+  JsonKey,
+  JsonNode,
+  JsonObject,
+  JsonProperty,
+  JsonValue,
+  NodeFactory,
+  nodeTypes
+} from "./ast";
 import error from "./error";
 import { junker } from "./junker";
 import parseErrorTypes from "./parseErrorTypes";
 import Position from "./position";
 import { tokenize, tokenTypes } from "./tokenize";
+import { ParseResult, ParseSettings } from "./types";
 
 // import util from 'util';
 
@@ -23,15 +35,20 @@ const arrayStates = {
   COMMA: 3
 };
 
-const defaultSettings = {
+const defaultSettings: ParseSettings = {
   verbose: true,
   junker: false
 };
 
-function parseObject(source, tokenList, index, settings) {
+function parseObject(
+  source: string,
+  tokenList,
+  index: number,
+  settings: ParseSettings
+): ParseResult<JsonObject> {
   let startToken;
   let property;
-  let object = NodeFactory.fromType(nodeTypes.OBJECT);
+  let object = NodeFactory.fromType<JsonObject>(nodeTypes.OBJECT);
 
   let state = objectStates._START_;
   let token;
@@ -40,7 +57,10 @@ function parseObject(source, tokenList, index, settings) {
     token = tokenList[index];
 
     if (token.type === tokenTypes.COMMENT) {
-      let comment = NodeFactory.fromType(nodeTypes.COMMENT, token.value);
+      let comment = NodeFactory.fromType<JsonComment>(
+        nodeTypes.COMMENT,
+        token.value
+      );
       if (settings.verbose) {
         comment.position = token.position;
       }
@@ -62,8 +82,11 @@ function parseObject(source, tokenList, index, settings) {
 
       case objectStates.OPEN_OBJECT:
         if (token.type === tokenTypes.STRING) {
-          property = NodeFactory.fromType(nodeTypes.PROPERTY);
-          property.key = NodeFactory.fromType(nodeTypes.KEY, token.value);
+          property = NodeFactory.fromType<JsonProperty>(nodeTypes.PROPERTY);
+          property.key = NodeFactory.fromType<JsonKey>(
+            nodeTypes.KEY,
+            token.value
+          );
 
           if (settings.verbose) {
             property.key.position = token.position;
@@ -166,8 +189,11 @@ function parseObject(source, tokenList, index, settings) {
 
       case objectStates.COMMA:
         if (token.type === tokenTypes.STRING) {
-          property = NodeFactory.fromType(nodeTypes.PROPERTY);
-          property.key = NodeFactory.fromType(nodeTypes.KEY, token.value);
+          property = NodeFactory.fromType<JsonProperty>(nodeTypes.PROPERTY);
+          property.key = NodeFactory.fromType<JsonKey>(
+            nodeTypes.KEY,
+            token.value
+          );
 
           if (settings.verbose) {
             property.key.position = token.position;
@@ -204,15 +230,23 @@ function parseObject(source, tokenList, index, settings) {
   error(parseErrorTypes.unexpectedEnd());
 }
 
-function parseArray(source, tokenList, index, settings) {
+function parseArray(
+  source: string,
+  tokenList,
+  index: number,
+  settings: ParseSettings
+): ParseResult<JsonArray> {
   let startToken;
-  let array = NodeFactory.fromType(nodeTypes.ARRAY);
+  let array = NodeFactory.fromType<JsonArray>(nodeTypes.ARRAY);
   let state = arrayStates._START_;
   let token;
   while (index < tokenList.length) {
     token = tokenList[index];
     if (token.type === tokenTypes.COMMENT) {
-      let comment = NodeFactory.fromType(nodeTypes.COMMENT, token.value);
+      let comment = NodeFactory.fromType<JsonComment>(
+        nodeTypes.COMMENT,
+        token.value
+      );
       if (settings.verbose) {
         comment.position = token.position;
       }
@@ -308,7 +342,12 @@ function parseArray(source, tokenList, index, settings) {
   error(parseErrorTypes.unexpectedEnd());
 }
 
-function parseValue(source, tokenList, index, settings) {
+function parseValue(
+  source: string,
+  tokenList,
+  index: number,
+  settings: ParseSettings
+): ParseResult<JsonValue | JsonObject | JsonArray> {
   // value: object | array | STRING | NUMBER | TRUE | FALSE | NULL | COMMENT
   let token = tokenList[index];
   let tokenType;
@@ -337,7 +376,7 @@ function parseValue(source, tokenList, index, settings) {
   }
   if (tokenType) {
     index++;
-    let value = NodeFactory.fromType(tokenType, token.value);
+    let value = NodeFactory.fromType<JsonValue>(tokenType, token.value);
     if (settings.verbose) {
       value.position = token.position;
     }
@@ -364,15 +403,23 @@ function parseValue(source, tokenList, index, settings) {
   }
 }
 
-function parseDocument(source, tokenList, index, settings) {
+function parseDocument(
+  source: string,
+  tokenList,
+  index: number,
+  settings: ParseSettings
+): ParseResult<JsonDocument> {
   // value | COMMENT*
   let token = tokenList[index];
   let tokenType = token.type;
 
-  let doc = NodeFactory.fromType(nodeTypes.DOCUMENT);
+  let doc = NodeFactory.fromType<JsonDocument>(nodeTypes.DOCUMENT);
 
   while (tokenType === tokenTypes.COMMENT) {
-    let comment = NodeFactory.fromType(nodeTypes.COMMENT, token.value);
+    let comment = NodeFactory.fromType<JsonComment>(
+      nodeTypes.COMMENT,
+      token.value
+    );
     if (settings.verbose) {
       comment.position = token.position;
     }
@@ -395,7 +442,10 @@ function parseDocument(source, tokenList, index, settings) {
       tokenType = token.type;
       doc.child.index = index;
 
-      let comment = NodeFactory.fromType(nodeTypes.COMMENT, token.value);
+      let comment = NodeFactory.fromType<JsonComment>(
+        nodeTypes.COMMENT,
+        token.value
+      );
       if (settings.verbose) {
         comment.position = token.position;
       }
@@ -412,7 +462,7 @@ function parseDocument(source, tokenList, index, settings) {
   return { value: doc, index: final_index };
 }
 
-export function parse(source, settings?: any) {
+export function parse(source, settings?: ParseSettings): JsonDocument {
   settings = Object.assign({}, defaultSettings, settings);
 
   let tokenList = tokenize(source, settings);

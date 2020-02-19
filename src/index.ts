@@ -15,4 +15,5 @@ export {
   nodeTypes
 } from "./ast";
 export { parse } from "./parse";
+export { ParseSettings } from "./types";
 export { Visitor } from "./visitor";

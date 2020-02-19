@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import { AST, parse, Visitor } from "../src";
+import { JsonNode, parse, Visitor } from "../src";
 
 function readFile(file) {
   var src = fs.readFileSync(file, "utf8");
@@ -165,6 +165,6 @@ describe("Object conversion to native JSON", function() {
     const NORMAL_JSON_BUFFER = JSON.stringify(JSON_TESTCASE);
     const documentNode = parse(NORMAL_JSON_BUFFER);
 
-    expect(JSON_TESTCASE).toEqual(AST.JsonNode.toJSON(documentNode));
+    expect(JSON_TESTCASE).toEqual(JsonNode.toJSON(documentNode));
   });
 });

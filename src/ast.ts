@@ -144,7 +144,7 @@ const nodeTypeObjectMapping = {
 // Utility methods to construct the objects
 //
 export class NodeFactory {
-  static fromType(objectType: nodeTypes, _value = null) {
+  static fromType<T extends JsonNode>(objectType: nodeTypes, _value = null): T {
     let clazz = nodeTypeObjectMapping[objectType];
     if (clazz === null)
       throw new Error(`AST node of type ${objectType} cannot be found`);
@@ -155,7 +155,6 @@ export class NodeFactory {
 // Just a recursive, slow implementation to a JavaScript object from this
 // JsonNode
 function recursiveNodeConversion(rootNode, parentObject?: any) {
-  
   let result = null;
   switch (rootNode.type) {
     case nodeTypes.DOCUMENT:
