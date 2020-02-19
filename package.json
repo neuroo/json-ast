@@ -1,10 +1,10 @@
 {
-  "name": "json-ast",
+  "name": "@anchan828/json-ast",
   "version": "2.1.7",
   "description": "JSON parser AST utilities",
-  "author": "Romain Gaucher",
-  "homepage": "https://github.com/neuroo/json-ast",
-  "repository": "neuroo/json-ast",
+  "author": "anchan828",
+  "homepage": "https://github.com/anchan828/json-ast",
+  "repository": "anchan828/json-ast",
   "maintainers": [
     {
       "name": "Vlad Trushin <monospectr@mail.ru> (https://github.com/vtrushin)",
@@ -30,6 +30,7 @@
     "ast"
   ],
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist",
     "LICENSE",
