@@ -1,7 +1,7 @@
 interface PositionLocation {
   line: number;
   column: number;
-  char: string;
+  char: number;
 }
 
 export default class Position {
@@ -14,7 +14,7 @@ export default class Position {
     private readonly endChar: number
   ) {}
 
-  get start() {
+  get start(): PositionLocation {
     return {
       line: this.startLine,
       column: this.startColumn,
@@ -22,11 +22,11 @@ export default class Position {
     };
   }
 
-  get end() {
+  get end(): PositionLocation {
     return { line: this.endLine, column: this.endColumn, char: this.endChar };
   }
 
-  get human() {
+  get human(): string {
     return `${this.startLine}:${this.startColumn} - ${this.endLine}:${this.endColumn} [${this.startChar}:${this.endChar}]`;
   }
 }

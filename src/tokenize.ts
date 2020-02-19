@@ -124,10 +124,11 @@ function parseWhitespace(source, index, line, column) {
     return null;
   }
 
-  return { index: index, line: line, column: column };
+  return { index, line, column };
 }
 
 function parseComment(source, index, line, column) {
+  const sourceLength = source.length;
   let char = source.charAt(index);
   if (char === "/") {
     let next_char = source.charAt(index + 1) || "";
@@ -136,7 +137,8 @@ function parseComment(source, index, line, column) {
       let first_index = index + 2,
         last_index = index + 2;
       index += 2;
-      while (index < source.length) {
+
+      while (index < sourceLength) {
         char = source.charAt(index);
         if (char === "\r") {
           last_index = index;
@@ -160,8 +162,8 @@ function parseComment(source, index, line, column) {
         }
       }
 
-      if (index >= source.length) {
-        last_index = source.length;
+      if (index >= sourceLength) {
+        last_index = sourceLength;
       }
 
       return {
@@ -178,7 +180,7 @@ function parseComment(source, index, line, column) {
       let first_index = index + 2,
         last_index = index + 2;
       index += 2;
-      while (index < source.length) {
+      while (index < sourceLength) {
         char = source.charAt(index);
         if (char !== "*") {
           if (char === "\r") {
@@ -196,8 +198,8 @@ function parseComment(source, index, line, column) {
           next_char = source.charAt(index + 1) || "";
           if ("/" === next_char) {
             last_index = index;
-            if (last_index >= source.length) {
-              last_index = source.length;
+            if (last_index >= sourceLength) {
+              last_index = sourceLength;
             }
 
             return {
@@ -219,7 +221,6 @@ function parseComment(source, index, line, column) {
 
 function parseChar(source, index, line, column) {
   const char = source.charAt(index);
-
   if (char in charTokens) {
     return {
       type: charTokens[char],
@@ -252,6 +253,7 @@ function parseKeyword(source, index, line, column) {
 }
 
 function parseIdentifier(source, index, line, column) {
+  const sourceLength = source.length;
   const startIndex = index;
   let buffer = "";
 
@@ -259,7 +261,7 @@ function parseIdentifier(source, index, line, column) {
   const firstChar = source.charAt(index);
   if (!(isLetter(firstChar) || firstChar === "_")) return null;
 
-  while (index < source.length) {
+  while (index < sourceLength) {
     const char = source.charAt(index);
     if (!(isLetter(char) || char === "_" || isDigit(char))) break;
     buffer += char;
@@ -280,13 +282,13 @@ function parseIdentifier(source, index, line, column) {
 }
 
 function parseString(source, index, line, column) {
+  const sourceLength = source.length;
   const startIndex = index;
   let buffer = "";
   let state = stringStates._START_;
 
-  while (index < source.length) {
+  while (index < sourceLength) {
     const char = source.charAt(index);
-
     switch (state) {
       case stringStates._START_:
         if (char === '"') {
@@ -342,11 +344,12 @@ function parseString(source, index, line, column) {
 }
 
 function parseNumber(source, index, line, column) {
+  const sourceLength = source.length;
   const startIndex = index;
   let passedValueIndex = index;
   let state = numberStates._START_;
 
-  iterator: while (index < source.length) {
+  iterator: while (index < sourceLength) {
     let char = source.charAt(index);
 
     switch (state) {
@@ -459,12 +462,13 @@ const defaultSettings = {
 
 export function tokenize(source, settings?: any) {
   settings = Object.assign({}, defaultSettings, settings);
+
   let line = 1;
   let column = 1;
   let index = 0;
   let tokens = [];
-
-  while (index < source.length) {
+  const sourceLength = source.length;
+  while (index < sourceLength) {
     let whitespace = parseWhitespace(source, index, line, column);
 
     if (whitespace) {
@@ -481,7 +485,6 @@ export function tokenize(source, settings?: any) {
       parseIdentifier(source, index, line, column) ||
       parseString(source, index, line, column) ||
       parseNumber(source, index, line, column);
-
     if (matched) {
       let token = { type: matched.type, value: matched.value } as {
         type: any;

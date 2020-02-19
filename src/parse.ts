@@ -82,7 +82,7 @@ function parseObject(source, tokenList, index, settings) {
             );
           }
           index++;
-          return { value: object, index: index };
+          return { value: object, index };
         } else {
           error(
             parseErrorTypes.unexpectedToken(
@@ -143,7 +143,7 @@ function parseObject(source, tokenList, index, settings) {
             );
           }
           index++;
-          return { value: object, index: index };
+          return { value: object, index };
         } else if (token.type === tokenTypes.COMMA) {
           state = objectStates.COMMA;
           index++;
@@ -209,7 +209,6 @@ function parseArray(source, tokenList, index, settings) {
   let array = NodeFactory.fromType(nodeTypes.ARRAY);
   let state = arrayStates._START_;
   let token;
-
   while (index < tokenList.length) {
     token = tokenList[index];
     if (token.type === tokenTypes.COMMENT) {
@@ -246,7 +245,7 @@ function parseArray(source, tokenList, index, settings) {
             );
           }
           index++;
-          return { value: array, index: index };
+          return { value: array, index };
         } else {
           let value = parseValue(source, tokenList, index, settings);
           index = value.index;
@@ -268,7 +267,7 @@ function parseArray(source, tokenList, index, settings) {
             );
           }
           index++;
-          return { value: array, index: index };
+          return { value: array, index };
         } else if (token.type === tokenTypes.COMMA) {
           state = arrayStates.COMMA;
           index++;
@@ -316,34 +315,33 @@ function parseValue(source, tokenList, index, settings) {
 
   switch (token.type) {
     case tokenTypes.STRING:
-      tokenType = "string";
+      tokenType = nodeTypes.STRING;
       break;
     case tokenTypes.NUMBER:
-      tokenType = "number";
+      tokenType = nodeTypes.NUMBER;
       break;
     case tokenTypes.TRUE:
-      tokenType = "true";
+      tokenType = nodeTypes.TRUE;
       break;
     case tokenTypes.FALSE:
-      tokenType = "false";
+      tokenType = nodeTypes.FALSE;
       break;
     case tokenTypes.NULL:
-      tokenType = "null";
+      tokenType = nodeTypes.NULL;
       break;
     case tokenTypes.COMMENT:
-      tokenType = "comment";
+      tokenType = nodeTypes.COMMENT;
       break;
     default:
       break;
   }
-
   if (tokenType) {
     index++;
     let value = NodeFactory.fromType(tokenType, token.value);
     if (settings.verbose) {
       value.position = token.position;
     }
-    return { value: value, index: index };
+    return { value, index };
   } else {
     let objectOrValue =
       parseObject(source, tokenList, index, settings) ||
@@ -367,7 +365,7 @@ function parseValue(source, tokenList, index, settings) {
 }
 
 function parseDocument(source, tokenList, index, settings) {
-  // value: value | COMMENT*
+  // value | COMMENT*
   let token = tokenList[index];
   let tokenType = token.type;
 
@@ -417,8 +415,7 @@ function parseDocument(source, tokenList, index, settings) {
 export function parse(source, settings?: any) {
   settings = Object.assign({}, defaultSettings, settings);
 
-  let tokenList = tokenize(source);
-
+  let tokenList = tokenize(source, settings);
   if (tokenList.length === 0) {
     error(parseErrorTypes.unexpectedEnd());
   }
