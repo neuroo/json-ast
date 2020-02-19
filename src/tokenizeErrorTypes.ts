@@ -1,5 +1,3 @@
-export default {
-	cannotTokenizeSymbol(symbol, line, column) {
-		return `Cannot tokenize symbol <${symbol}> at ${line}:${column}`;
-	}
-};
+export function cannotTokenizeSymbol(symbol: string, line: number, column: number): string {
+  return `Cannot tokenize symbol <${symbol}> at ${line}:${column}`;
+}

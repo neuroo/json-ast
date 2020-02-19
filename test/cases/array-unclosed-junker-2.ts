@@ -1,10 +1,10 @@
 import { createArray, createDocument, createString } from "../types";
 
-var doc = createDocument;
-var array = createArray;
-var string = createString;
+const doc = createDocument;
+const array = createArray;
+const string = createString;
 
 export = {
   ast: doc(array([array([string("a"), string("b")])])),
-  options: { verbose: false, junker: true }
+  options: { verbose: false, junker: true },
 };

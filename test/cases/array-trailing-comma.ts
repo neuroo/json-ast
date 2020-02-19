@@ -1,10 +1,10 @@
 import { createArray, createDocument, createNumber } from "../types";
 
-var doc = createDocument;
-var array = createArray;
-var number = createNumber;
+const doc = createDocument;
+const array = createArray;
+const number = createNumber;
 
 export = {
   ast: doc(array([number("1")])),
-  options: { verbose: false }
+  options: { verbose: false },
 };

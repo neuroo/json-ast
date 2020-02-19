@@ -7,5 +7,5 @@ module.exports = {
   preset: "ts-jest",
   rootDir: "./test",
   testEnvironment: "node",
-  verbose: true
+  verbose: true,
 };

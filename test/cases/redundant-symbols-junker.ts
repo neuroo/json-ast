@@ -4,22 +4,19 @@ import {
   createNumber,
   createObject,
   createObjectKey,
-  createObjectProperty
+  createObjectProperty,
 } from "../types";
 
-var object = createObject;
-var key = createObjectKey;
-var prop = createObjectProperty;
-var number = createNumber;
-var doc = createDocument;
-var array = createArray;
+const object = createObject;
+const key = createObjectKey;
+const prop = createObjectProperty;
+const number = createNumber;
+const doc = createDocument;
+const array = createArray;
 
-var ast = object([
-  prop(key("a"), number("1")),
-  prop(key("b"), array([number("1"), number("2"), number("3")]))
-]);
+const ast = object([prop(key("a"), number("1")), prop(key("b"), array([number("1"), number("2"), number("3")]))]);
 
 export = {
   ast: doc(ast),
-  options: { verbose: false, junker: true }
+  options: { verbose: false, junker: true },
 };

@@ -1,6 +1,6 @@
-import { JsonNode } from "./ast";
+import { IJsonNode } from "./ast";
 import { JsonPosition } from "./position";
-export interface ParseResult<T extends JsonNode> {
+export interface ParseResult<T extends IJsonNode> {
   value: T;
   index: number;
 }

@@ -1,18 +1,12 @@
-import {
-  createDocument,
-  createObject,
-  createObjectKey,
-  createObjectProperty,
-  createString
-} from "../types";
+import { createDocument, createObject, createObjectKey, createObjectProperty, createString } from "../types";
 
-var object = createObject;
-var key = createObjectKey;
-var prop = createObjectProperty;
-var string = createString;
-var doc = createDocument;
+const object = createObject;
+const key = createObjectKey;
+const prop = createObjectProperty;
+const string = createString;
+const doc = createDocument;
 
-var ast = object([
+const ast = object([
   prop(key('quota\\"tion'), string("reverse\\\\solidus")),
   prop(key("soli\\/dus"), string("back\\bspace")),
   prop(key("form\\ffeed"), string("new\\nline")),
@@ -20,10 +14,10 @@ var ast = object([
   prop(key("hex\\u0001digit"), string("")),
   prop(key('\\"\\"\\"\\"'), string("\\\\\\\\\\\\")),
   prop(key("\\/"), string("\\b")),
-  prop(key('\\"\\/'), string('\\"\\\\\\/\\b\\f\\n\\r\\t\\u0001'))
+  prop(key('\\"\\/'), string('\\"\\\\\\/\\b\\f\\n\\r\\t\\u0001')),
 ]);
 
 export = {
   ast: doc(ast),
-  options: { verbose: false }
+  options: { verbose: false },
 };

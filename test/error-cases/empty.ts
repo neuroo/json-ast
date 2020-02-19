@@ -1,5 +1,5 @@
 export = {
   error: {
-    message: "Unexpected end of JSON input"
-  }
+    message: "Unexpected end of JSON input",
+  },
 };

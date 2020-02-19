@@ -12,7 +12,7 @@ export {
   JsonString,
   JsonTrue,
   JsonValue,
-  nodeTypes
+  JsonNodeTypes as nodeTypes,
 } from "./ast";
 export { parse } from "./parse";
 export { JsonPosition } from "./position";

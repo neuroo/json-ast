@@ -1,9 +1,9 @@
 import { createArray, createDocument, position } from "../types";
 
-var doc = createDocument;
-var array = createArray;
+const doc = createDocument;
+const array = createArray;
 
 export = {
   ast: doc(array([], position(1, 1, 0, 1, 3, 2))),
-  options: { verbose: true }
+  options: { verbose: true },
 };

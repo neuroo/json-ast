@@ -1,9 +1,23 @@
-import { nodeTypes } from "./ast";
+import {
+  JsonArray,
+  JsonComment,
+  JsonDocument,
+  JsonFalse,
+  JsonKey,
+  JsonNode,
+  JsonNodeTypes,
+  JsonNull,
+  JsonObject,
+  JsonProperty,
+  JsonString,
+  JsonTrue,
+  JsonValue,
+} from "./ast";
 
 // Do not export this function as it provides the main traversal of the AST
-function traverseAST(visitor, node) {
+function traverseAST(visitor: Visitor, node: JsonNode): void {
   switch (node.type) {
-    case nodeTypes.DOCUMENT: {
+    case JsonNodeTypes.DOCUMENT: {
       visitor.document(node);
       if (node.comments) {
         node.comments.forEach(commentNode => {
@@ -15,7 +29,7 @@ function traverseAST(visitor, node) {
       }
       break;
     }
-    case nodeTypes.OBJECT: {
+    case JsonNodeTypes.OBJECT: {
       visitor.object(node);
       if (node.comments) {
         node.comments.forEach(commentNode => {
@@ -29,17 +43,17 @@ function traverseAST(visitor, node) {
       }
       break;
     }
-    case nodeTypes.PROPERTY: {
+    case JsonNodeTypes.PROPERTY: {
       visitor.property(node);
       node.key.accept(visitor);
       node.value.accept(visitor);
       break;
     }
-    case nodeTypes.KEY: {
+    case JsonNodeTypes.KEY: {
       visitor.key(node);
       break;
     }
-    case nodeTypes.ARRAY: {
+    case JsonNodeTypes.ARRAY: {
       visitor.array(node);
       if (visitor.stop) break;
       if (node.comments) {
@@ -54,29 +68,29 @@ function traverseAST(visitor, node) {
       }
       break;
     }
-    case nodeTypes.STRING: {
+    case JsonNodeTypes.STRING: {
       visitor.value(node);
       if (!visitor.stop) visitor.string(node);
       break;
     }
-    case nodeTypes.NUMBER: {
+    case JsonNodeTypes.NUMBER: {
       visitor.value(node);
       if (!visitor.stop) visitor.number(node);
       break;
     }
-    case nodeTypes.TRUE: {
+    case JsonNodeTypes.TRUE: {
       visitor.value(node);
       if (!visitor.stop) visitor.boolean(node);
       break;
     }
-    case nodeTypes.FALSE: {
+    case JsonNodeTypes.FALSE: {
       visitor.value(node);
       if (!visitor.stop) visitor.boolean(node);
       break;
     }
-    case nodeTypes.NULL: {
+    case JsonNodeTypes.NULL: {
       visitor.value(node);
-      if (!visitor.stop) visitor.nil(node);
+      if (!visitor.stop) visitor.null(node);
       break;
     }
     default:
@@ -84,68 +98,69 @@ function traverseAST(visitor, node) {
   }
 }
 
-export class Visitor {
-  private _stop: boolean;
+export interface IVisit {
+  document(docNode: JsonDocument): void;
 
-  constructor() {
-    this._stop = false;
-  }
+  object(objectNode: JsonObject): void;
 
-  set stop(_stop) {
-    this._stop = !!_stop;
-  }
-  get stop() {
-    return this._stop;
-  }
+  property(propertyNode: JsonProperty): void;
 
-  document(docNode) {
-    //
-  }
+  key(keyNode: JsonKey): void;
+  array(arrayNode: JsonArray): void;
 
-  object(objectNode) {
-    //
-  }
+  value(valueNode: JsonValue): void;
 
-  property(propertyNode) {
-    //
-  }
+  comment(commentNode: JsonComment): void;
 
-  key(keyNode) {
-    //
-  }
+  string(stringNode: JsonString): void;
 
-  array(arrayNode) {
-    //
-  }
+  number(numberNode: JsonNode): void;
 
-  value(valueNode) {
-    //
-  }
+  boolean(booleanNode: JsonTrue | JsonFalse): void;
 
-  comment(commentNode) {
-    //
-  }
+  null(nullNode: JsonNull): void;
+}
 
-  string(stringNode) {
-    //
-  }
-
-  number(numberNode) {
-    //
-  }
-
-  boolean(booleanNode) {
-    // encapsulates true | false
-  }
-
-  nil(nullNode) {
-    // null
-  }
+export abstract class Visitor implements IVisit {
+  public stop = false;
 
   // Visit
-  visit(node) {
+  public visit(node: JsonNode): void {
     // call to "private" function
     if (this.stop) return;
     traverseAST(this, node);
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+  public document(docNode: JsonDocument): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+  public object(objectNode: JsonObject): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+  public property(propertyNode: JsonProperty): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+  public key(keyNode: JsonKey): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+  public array(arrayNode: JsonArray): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+  public value(valueNode: JsonValue): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+  public comment(commentNode: JsonComment): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+  public string(stringNode: JsonString): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+  public number(numberNode: JsonNode): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+  public boolean(booleanNode: JsonTrue | JsonFalse): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+  public null(nullNode: JsonNull): void {}
 }

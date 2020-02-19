@@ -1,18 +1,12 @@
-import {
-  createDocument,
-  createNumber,
-  createObject,
-  createObjectKey,
-  createObjectProperty
-} from "../types";
+import { createDocument, createNumber, createObject, createObjectKey, createObjectProperty } from "../types";
 
-var doc = createDocument;
-var object = createObject;
-var number = createNumber;
-var key = createObjectKey;
-var prop = createObjectProperty;
+const doc = createDocument;
+const object = createObject;
+const number = createNumber;
+const key = createObjectKey;
+const prop = createObjectProperty;
 
 export = {
   ast: doc(object([prop(key("a"), number("1"))])),
-  options: { verbose: false, junker: true }
+  options: { verbose: false, junker: true },
 };

@@ -1,9 +1,19 @@
 import * as fs from "fs";
 import * as path from "path";
-import { JsonNode, parse, Visitor } from "../src";
+import {
+  JsonComment,
+  JsonDocument,
+  JsonKey,
+  JsonNode,
+  JsonProperty,
+  JsonValue,
+  parse,
+  ParseSettings,
+  Visitor,
+} from "../src";
 
-function readFile(file) {
-  var src = fs.readFileSync(file, "utf8");
+function readFile(file: string): string {
+  let src = fs.readFileSync(file, "utf8");
   // normalize line endings
   src = src.replace(/\r\n/, "\n");
   // remove trailing newline
@@ -12,10 +22,17 @@ function readFile(file) {
   return src;
 }
 
-function getCases(dirname, callback) {
-  var folderPath = path.join(__dirname, dirname);
-  var folder = fs.readdirSync(folderPath);
-  var cases = folder
+function getCases(
+  dirname: string,
+  callback: (
+    caseName: string,
+    inputFile: string,
+    expectedFile: { ast: JsonDocument; options: ParseSettings; error: Error; visitor: any },
+  ) => void,
+): void {
+  const folderPath = path.join(__dirname, dirname);
+  const folder = fs.readdirSync(folderPath);
+  const cases = folder
     .filter(function(_case) {
       return path.extname(_case) === ".json" && _case.charAt(0) !== "_";
     })
@@ -24,8 +41,9 @@ function getCases(dirname, callback) {
     });
 
   for (const _case of cases) {
-    var inputFile = readFile(path.join(folderPath, _case + ".json"));
-    var expectedFile = require(path.join(folderPath, _case + ".ts"));
+    const inputFile = readFile(path.join(folderPath, _case + ".json"));
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const expectedFile = require(path.join(folderPath, _case + ".ts"));
     if (callback) {
       callback(_case, inputFile, expectedFile);
     }
@@ -35,12 +53,10 @@ function getCases(dirname, callback) {
 describe("Test cases", function() {
   getCases("cases", function(caseName, inputFile, expectedFile) {
     it(caseName, function() {
-      var parsedFile = parse(inputFile, expectedFile.options);
+      const parsedFile = parse(inputFile, expectedFile.options);
       // Now that we include methods in each Node, a simple way to test for
       // equality is to serialize the objects.
-      expect(JSON.stringify(parsedFile)).toEqual(
-        JSON.stringify(expectedFile.ast)
-      );
+      expect(JSON.stringify(parsedFile)).toEqual(JSON.stringify(expectedFile.ast));
     });
   });
 });
@@ -61,22 +77,23 @@ describe("Error test cases", function() {
 // A simple visitor that will aggregate the values by type of Node
 class TestAccumulatorVisitor extends Visitor {
   private store: any;
+
   constructor(store) {
     super();
     this.store = store;
   }
 
-  comment(commentNode) {
+  public comment(commentNode: JsonComment): void {
     this.store.comments = this.store.comments || [];
     this.store.comments.push(commentNode.value);
   }
 
-  key(keyNode) {
+  public key(keyNode: JsonKey): void {
     this.store.keys = this.store.keys || [];
     this.store.keys.push(keyNode.value);
   }
 
-  value(valueNode) {
+  public value(valueNode: JsonValue): void {
     this.store.values = this.store.values || [];
     this.store.values.push(valueNode.value);
   }
@@ -99,18 +116,19 @@ describe("Visitor cases", function() {
 
 class SkipAfterAKey extends Visitor {
   private _store: any;
+
   constructor(store) {
     super();
     this._store = store;
   }
 
-  property(propNode) {
+  public property(propNode: JsonProperty): void {
     const keyNode = propNode.key;
     // stop when the first prop key name has more than 2 char
     if (keyNode.value.length > 1) this.stop = true;
   }
 
-  value(valueNode) {
+  public value(valueNode: JsonValue): void {
     this._store.push(valueNode.value);
   }
 }
@@ -148,17 +166,17 @@ describe("Object conversion to native JSON", function() {
             true: true,
             false: false,
             float: -15345345.0223,
-            null: null
+            null: null,
           },
           {
             true: true,
             false: false,
             float: -1.0233323,
-            null: null
-          }
-        ]
+            null: null,
+          },
+        ],
       },
-      e: null
+      e: null,
     };
 
     const NORMAL_JSON_BUFFER = JSON.stringify(JSON_TESTCASE);

@@ -1,13 +1,13 @@
 // import util from 'util';
-import { tokenTypes } from "./tokenize";
+import { JsonTokenTypes } from "./tokenize";
 import { JsonToken, ParseSettings } from "./types";
 
-function findLastTokenIndexIn(tokenList, tokenTypes) {
+function findLastTokenIndexIn(tokenList, JsonTokenTypes): number {
   let rindex = tokenList.length - 1;
   let rtoken_type;
   while (rindex >= 0) {
     rtoken_type = tokenList[rindex].type;
-    if (tokenTypes.indexOf(rtoken_type) >= 0) {
+    if (JsonTokenTypes.indexOf(rtoken_type) >= 0) {
       return rindex;
     }
     rindex--;
@@ -17,30 +17,30 @@ function findLastTokenIndexIn(tokenList, tokenTypes) {
 
 // Only called when the junker settings is set to true. It balances the
 // arrays/objects so there is no extra tokens left in the list.
-function balancer(tokenList: JsonToken[], settings: ParseSettings) {
+function balancer(tokenList: JsonToken[]): JsonToken[] {
   let token = null;
   let index = 0;
   const max_index = tokenList.length;
-  let newTokenList = [];
-  let state = { brace: 0, bracket: 0 };
+  const newTokenList: JsonToken[] = [];
+  const state = { brace: 0, bracket: 0 };
 
   // Find the last real token we care about.
   const last_balanced_token = findLastTokenIndexIn(tokenList, [
-    tokenTypes.LEFT_BRACE,
-    tokenTypes.RIGHT_BRACE,
-    tokenTypes.LEFT_BRACKET,
-    tokenTypes.RIGHT_BRACKET
+    JsonTokenTypes.LEFT_BRACE,
+    JsonTokenTypes.RIGHT_BRACE,
+    JsonTokenTypes.LEFT_BRACKET,
+    JsonTokenTypes.RIGHT_BRACKET,
   ]);
 
   // Recover from extra closing braces/brackets
   while (index <= last_balanced_token) {
     token = tokenList[index];
     switch (token.type) {
-      case tokenTypes.LEFT_BRACE:
+      case JsonTokenTypes.LEFT_BRACE:
         state.brace++;
         newTokenList.push(token);
         break;
-      case tokenTypes.RIGHT_BRACE:
+      case JsonTokenTypes.RIGHT_BRACE:
         if (state.brace === 0) {
           // nothing to close
         } else {
@@ -48,11 +48,11 @@ function balancer(tokenList: JsonToken[], settings: ParseSettings) {
           newTokenList.push(token);
         }
         break;
-      case tokenTypes.LEFT_BRACKET:
+      case JsonTokenTypes.LEFT_BRACKET:
         state.bracket++;
         newTokenList.push(token);
         break;
-      case tokenTypes.RIGHT_BRACKET:
+      case JsonTokenTypes.RIGHT_BRACKET:
         if (state.bracket === 0) {
           // nothing to close
         } else {
@@ -77,21 +77,14 @@ function balancer(tokenList: JsonToken[], settings: ParseSettings) {
   // Recover from missing closing braces/brackets, at the end only
   if (state.brace > 0 || state.bracket > 0) {
     if (state.brace > 0) {
-      let last_brace_index = findLastTokenIndexIn(tokenList, [
-        tokenTypes.RIGHT_BRACE
-      ]);
+      const last_brace_index = findLastTokenIndexIn(tokenList, [JsonTokenTypes.RIGHT_BRACE]);
       let using_right_brace = null;
       if (last_brace_index < 0) {
         // no last brace, so we'll need to create a new one
-        const last_opening_brace_index = findLastTokenIndexIn(tokenList, [
-          tokenTypes.LEFT_BRACE
-        ]);
-        using_right_brace = Object.assign(
-          {},
-          tokenList[last_opening_brace_index]
-        );
+        const last_opening_brace_index = findLastTokenIndexIn(tokenList, [JsonTokenTypes.LEFT_BRACE]);
+        using_right_brace = Object.assign({}, tokenList[last_opening_brace_index]);
 
-        using_right_brace.type = tokenTypes.RIGHT_BRACE;
+        using_right_brace.type = JsonTokenTypes.RIGHT_BRACE;
       } else {
         using_right_brace = tokenList[last_brace_index];
       }
@@ -107,21 +100,14 @@ function balancer(tokenList: JsonToken[], settings: ParseSettings) {
     }
 
     if (state.bracket > 0) {
-      let last_bracket_index = findLastTokenIndexIn(tokenList, [
-        tokenTypes.RIGHT_BRACKET
-      ]);
+      const last_bracket_index = findLastTokenIndexIn(tokenList, [JsonTokenTypes.RIGHT_BRACKET]);
       let using_right_bracket = null;
       if (last_bracket_index < 0) {
         // no last brace, so we'll need to create a new one
-        const last_opening_bracket_index = findLastTokenIndexIn(tokenList, [
-          tokenTypes.LEFT_BRACKET
-        ]);
-        using_right_bracket = Object.assign(
-          {},
-          tokenList[last_opening_bracket_index]
-        );
+        const last_opening_bracket_index = findLastTokenIndexIn(tokenList, [JsonTokenTypes.LEFT_BRACKET]);
+        using_right_bracket = Object.assign({}, tokenList[last_opening_bracket_index]);
 
-        using_right_bracket.type = tokenTypes.RIGHT_BRACKET;
+        using_right_bracket.type = JsonTokenTypes.RIGHT_BRACKET;
       } else {
         using_right_bracket = tokenList[last_bracket_index];
       }
@@ -144,53 +130,43 @@ function balancer(tokenList: JsonToken[], settings: ParseSettings) {
 }
 
 const TOKEN_TERMINALS = [
-  tokenTypes.STRING,
-  tokenTypes.NUMBER,
-  tokenTypes.TRUE,
-  tokenTypes.FALSE,
-  tokenTypes.NULL
+  JsonTokenTypes.STRING,
+  JsonTokenTypes.NUMBER,
+  JsonTokenTypes.TRUE,
+  JsonTokenTypes.FALSE,
+  JsonTokenTypes.NULL,
 ];
 
 // Returns true if two consecutive terminals are found in the JSON
-function is_double_value_pattern(tokenList: JsonToken[], index: number) {
+function is_double_value_pattern(tokenList: JsonToken[], index: number): boolean {
   if (index >= tokenList.length - 1) return false;
-  let currentToken = tokenList[index];
-  let nextToken = tokenList[index + 1];
-  return (
-    TOKEN_TERMINALS.indexOf(currentToken.type) >= 0 &&
-    TOKEN_TERMINALS.indexOf(nextToken.type) >= 0
-  );
+  const currentToken = tokenList[index];
+  const nextToken = tokenList[index + 1];
+  return TOKEN_TERMINALS.indexOf(currentToken.type) >= 0 && TOKEN_TERMINALS.indexOf(nextToken.type) >= 0;
 }
 
-const RIGHT_BRACE_BRACKETS = [tokenTypes.RIGHT_BRACKET, tokenTypes.RIGHT_BRACE];
-const LEFT_BRACE_BRACKETS = [tokenTypes.LEFT_BRACKET, tokenTypes.LEFT_BRACE];
+const RIGHT_BRACE_BRACKETS = [JsonTokenTypes.RIGHT_BRACKET, JsonTokenTypes.RIGHT_BRACE];
+const LEFT_BRACE_BRACKETS = [JsonTokenTypes.LEFT_BRACKET, JsonTokenTypes.LEFT_BRACE];
 
-function is_confused_terminators(tokenList: JsonToken[], index: number) {
+function is_confused_terminators(tokenList: JsonToken[], index: number): boolean {
   if (index >= tokenList.length - 1) return false;
-  let currentToken = tokenList[index];
-  let nextToken = tokenList[index + 1];
+  const currentToken = tokenList[index];
+  const nextToken = tokenList[index + 1];
 
-  return (
-    RIGHT_BRACE_BRACKETS.indexOf(currentToken.type) >= 0 &&
-    LEFT_BRACE_BRACKETS.indexOf(nextToken.type) >= 0
-  );
+  return RIGHT_BRACE_BRACKETS.indexOf(currentToken.type) >= 0 && LEFT_BRACE_BRACKETS.indexOf(nextToken.type) >= 0;
 }
 
-function is_terminator_and_value(tokenList: JsonToken[], index: number) {
+function is_terminator_and_value(tokenList: JsonToken[], index: number): boolean {
   if (index >= tokenList.length - 1) return false;
-  let currentToken = tokenList[index];
-  let nextToken = tokenList[index + 1];
+  const currentToken = tokenList[index];
+  const nextToken = tokenList[index + 1];
 
-  return (
-    RIGHT_BRACE_BRACKETS.indexOf(currentToken.type) >= 0 &&
-    TOKEN_TERMINALS.indexOf(nextToken.type) >= 0
-  );
+  return RIGHT_BRACE_BRACKETS.indexOf(currentToken.type) >= 0 && TOKEN_TERMINALS.indexOf(nextToken.type) >= 0;
 }
 
-function comma_injection(tokenList: JsonToken[], settings: ParseSettings) {
-  let newTokenList = [];
-  var token = null;
-  var index = 0;
+function comma_injection(tokenList: JsonToken[]): JsonToken[] {
+  const newTokenList = [];
+  let index = 0;
   const max_index = tokenList.length;
 
   // The first phase find all the potential error locations in term of indexes
@@ -209,8 +185,8 @@ function comma_injection(tokenList: JsonToken[], settings: ParseSettings) {
         is_confused_terminators(tokenList, index) ||
         is_terminator_and_value(tokenList, index))
     ) {
-      let comma_token = Object.assign({}, tokenList[index]);
-      comma_token.type = tokenTypes.COMMA;
+      const comma_token = Object.assign({}, tokenList[index]);
+      comma_token.type = JsonTokenTypes.COMMA;
       newTokenList.push(comma_token);
     }
     index++;
@@ -222,17 +198,17 @@ function comma_injection(tokenList: JsonToken[], settings: ParseSettings) {
 }
 
 // Quote identifiers taht seem to be used as keys
-function quote_keys(tokenList: JsonToken[], settings: ParseSettings) {
-  let newTokenList = [];
-  var token = null;
-  var index = 0;
+function quote_keys(tokenList: JsonToken[]): JsonToken[] {
+  const newTokenList = [];
+  let token = null;
+  let index = 0;
   const max_index = tokenList.length;
 
   while (index < max_index) {
     token = tokenList[index];
-    if (token.type === tokenTypes.IDENTIFIER) {
-      let string_token = Object.assign({}, token);
-      string_token.type = tokenTypes.STRING;
+    if (token.type === JsonTokenTypes.IDENTIFIER) {
+      const string_token = Object.assign({}, token);
+      string_token.type = JsonTokenTypes.STRING;
       newTokenList.push(string_token);
     } else {
       newTokenList.push(tokenList[index]);
@@ -249,18 +225,18 @@ const JUNKER_PROCESSES = [
   // Enforce quotes around keys in the JSON
   quote_keys,
   // The comma injection should happen after everything
-  comma_injection
+  comma_injection,
 ];
 
 // Running all the junker processes. These are responsible for achieving one
 // specific thing.
-export function junker(tokenList: JsonToken[], settings: ParseSettings) {
+export function junker(tokenList: JsonToken[], settings: ParseSettings): JsonToken[] {
   if (settings.junker === false) return tokenList;
-  var resultTokens = tokenList;
-  for (var i = 0; i < JUNKER_PROCESSES.length; i++) {
-    let processor = JUNKER_PROCESSES[i];
+  let resultTokens = tokenList;
+  for (let i = 0; i < JUNKER_PROCESSES.length; i++) {
+    const processor = JUNKER_PROCESSES[i];
     try {
-      let tmpResultTokens = processor(resultTokens, settings);
+      const tmpResultTokens = processor(resultTokens);
       resultTokens = tmpResultTokens;
     } catch (e) {
       console.error(e);
