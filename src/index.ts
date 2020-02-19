@@ -17,7 +17,7 @@ export { nodeTypes } from "./ast";
 export { parse } from "./parse";
 export { Visitor } from "./visitor";
 
-export const AST = {
+module.exports.AST = {
   JsonArray,
   JsonComment,
   JsonDocument,
