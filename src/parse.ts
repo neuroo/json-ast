@@ -414,7 +414,7 @@ function parseDocument(source, tokenList, index, settings) {
   return { value: doc, index: final_index };
 }
 
-export function parse(source, settings) {
+export function parse(source, settings?: any) {
   settings = Object.assign({}, defaultSettings, settings);
 
   let tokenList = tokenize(source);

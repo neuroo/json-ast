@@ -15,6 +15,11 @@
       "name": "Romain Gaucher (https://github.com/neuroo)",
       "email": "r@rgaucher.info",
       "github-username": "neuroo"
+    },
+    {
+      "name": "anchan828 (https://github.com/anchan828)",
+      "email": "anchan828@gmail.com",
+      "github-username": "anchan828"
     }
   ],
   "license": "MIT",
@@ -31,9 +36,12 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "jest"
   },
   "devDependencies": {
+    "@types/jest": "25.1.2",
+    "@types/node": "13.7.2",
     "jest": "25.1.0",
     "ts-jest": "25.2.0",
     "typescript": "3.7.5"

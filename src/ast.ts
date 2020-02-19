@@ -174,7 +174,7 @@ export class JsonString extends JsonValue {
 
 export class JsonNumber extends JsonValue {
   constructor(_value = null) {
-    super(_value, nodeTypes.NUMBER);
+    super(+_value, nodeTypes.NUMBER);
   }
 }
 
