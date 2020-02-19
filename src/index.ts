@@ -1,10 +1,12 @@
 export {
+  IJsonValue,
   JsonArray,
   JsonComment,
   JsonDocument,
   JsonFalse,
   JsonKey,
   JsonNode,
+  JsonNodeTypes,
   JsonNull,
   JsonNumber,
   JsonObject,
@@ -12,7 +14,9 @@ export {
   JsonString,
   JsonTrue,
   JsonValue,
-  JsonNodeTypes as nodeTypes,
+  toJSON,
+  toObject,
+  toString,
 } from "./ast";
 export { parse } from "./parse";
 export { JsonPosition } from "./position";

@@ -1,21 +1,22 @@
 import {
+  IJsonValue,
   JsonArray,
   JsonComment,
   JsonDocument,
   JsonFalse,
   JsonKey,
   JsonNode,
+  JsonNodeType,
   JsonNodeTypes,
   JsonNull,
   JsonObject,
   JsonProperty,
   JsonString,
   JsonTrue,
-  JsonValue,
 } from "./ast";
 
 // Do not export this function as it provides the main traversal of the AST
-function traverseAST(visitor: Visitor, node: JsonNode): void {
+function traverseAST(visitor: Visitor, node: JsonNodeType): void {
   switch (node.type) {
     case JsonNodeTypes.DOCUMENT: {
       visitor.document(node);
@@ -108,7 +109,7 @@ export interface IVisit {
   key(keyNode: JsonKey): void;
   array(arrayNode: JsonArray): void;
 
-  value(valueNode: JsonValue): void;
+  value(valueNode: IJsonValue): void;
 
   comment(commentNode: JsonComment): void;
 
@@ -125,7 +126,7 @@ export abstract class Visitor implements IVisit {
   public stop = false;
 
   // Visit
-  public visit(node: JsonNode): void {
+  public visit(node: JsonNodeType): void {
     // call to "private" function
     if (this.stop) return;
     traverseAST(this, node);
@@ -147,7 +148,7 @@ export abstract class Visitor implements IVisit {
   public array(arrayNode: JsonArray): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-  public value(valueNode: JsonValue): void {}
+  public value(valueNode: IJsonValue): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
   public comment(commentNode: JsonComment): void {}

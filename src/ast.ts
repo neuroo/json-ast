@@ -23,27 +23,19 @@ export interface IJsonNode {
   accept(visitor: Visitor): void;
 }
 
+export interface IJsonValue extends IJsonNode {
+  value: any;
+  type: JsonNodeTypes;
+}
+
 // All elements in the tree will extend the `JsonNode` base class
-export class JsonNode implements IJsonNode {
+export abstract class JsonNode implements IJsonNode {
   public position: JsonPosition = null;
 
-  constructor(public readonly type: JsonNodeTypes = JsonNodeTypes.ERROR) {}
-
-  public static toObject<T extends object>(jsonNode: JsonNode): T {
-    return JSON.parse(JSON.stringify(jsonNode));
-  }
-
-  public static toString(jsonNode: JsonNode): string {
-    return JSON.stringify(jsonNode);
-  }
-
-  public static toJSON<T extends any>(jsonNode: JsonNode): T {
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return toJSON(jsonNode);
-  }
+  public readonly type: JsonNodeTypes = JsonNodeTypes.ERROR;
 
   public accept(visitor: Visitor): void {
-    visitor.visit(this);
+    visitor.visit(this as any);
   }
 }
 
@@ -52,9 +44,7 @@ export class JsonDocument extends JsonNode {
 
   public readonly comments: JsonComment[] = [];
 
-  constructor() {
-    super(JsonNodeTypes.DOCUMENT);
-  }
+  public readonly type: JsonNodeTypes.DOCUMENT = JsonNodeTypes.DOCUMENT;
 }
 
 export class JsonObject extends JsonNode {
@@ -62,9 +52,7 @@ export class JsonObject extends JsonNode {
 
   public readonly comments: JsonComment[] = [];
 
-  constructor() {
-    super(JsonNodeTypes.OBJECT);
-  }
+  public readonly type: JsonNodeTypes.OBJECT = JsonNodeTypes.OBJECT;
 }
 
 export class JsonProperty extends JsonNode {
@@ -72,9 +60,7 @@ export class JsonProperty extends JsonNode {
 
   public value: JsonValue = null;
 
-  constructor() {
-    super(JsonNodeTypes.PROPERTY);
-  }
+  public readonly type: JsonNodeTypes.PROPERTY = JsonNodeTypes.PROPERTY;
 }
 
 export class JsonArray extends JsonNode {
@@ -82,57 +68,68 @@ export class JsonArray extends JsonNode {
 
   public readonly comments: JsonComment[] = [];
 
-  constructor() {
-    super(JsonNodeTypes.ARRAY);
+  public readonly type: JsonNodeTypes.ARRAY = JsonNodeTypes.ARRAY;
+}
+
+export class JsonValue extends JsonNode implements IJsonValue {
+  public readonly type: JsonNodeTypes.VALUE = JsonNodeTypes.VALUE;
+
+  constructor(public value: any = null) {
+    super();
   }
 }
 
-export class JsonValue extends JsonNode {
-  constructor(public value = null, _type = JsonNodeTypes.VALUE) {
-    super(_type);
+export class JsonKey extends JsonNode implements IJsonValue {
+  public readonly type: JsonNodeTypes.KEY = JsonNodeTypes.KEY;
+
+  constructor(public value: string = null) {
+    super();
   }
 }
 
-export class JsonKey extends JsonValue {
-  constructor(_value = null) {
-    super(_value, JsonNodeTypes.KEY);
+export class JsonComment extends JsonNode implements IJsonValue {
+  public readonly type: JsonNodeTypes.KEY = JsonNodeTypes.KEY;
+
+  constructor(public value: string = null) {
+    super();
   }
 }
 
-export class JsonComment extends JsonValue {
-  constructor(_value = null) {
-    super(_value, JsonNodeTypes.COMMENT);
+export class JsonString extends JsonNode implements IJsonValue {
+  public readonly type: JsonNodeTypes.STRING = JsonNodeTypes.STRING;
+
+  constructor(public value: string = null) {
+    super();
   }
 }
 
-export class JsonString extends JsonValue {
-  constructor(_value = null) {
-    super(_value, JsonNodeTypes.STRING);
+export class JsonNumber extends JsonNode implements IJsonValue {
+  public readonly type: JsonNodeTypes.NUMBER = JsonNodeTypes.NUMBER;
+
+  constructor(public value: number = null) {
+    super();
+    if (typeof value === "string") {
+      this.value = parseFloat(value);
+    }
   }
 }
 
-export class JsonNumber extends JsonValue {
-  constructor(_value = null) {
-    super(+_value, JsonNodeTypes.NUMBER);
-  }
+export class JsonTrue extends JsonNode implements IJsonValue {
+  public readonly value: true = true;
+
+  public readonly type: JsonNodeTypes.TRUE = JsonNodeTypes.TRUE;
 }
 
-export class JsonTrue extends JsonValue {
-  constructor() {
-    super(true, JsonNodeTypes.TRUE);
-  }
+export class JsonFalse extends JsonNode implements IJsonValue {
+  public readonly value: false = false;
+
+  public readonly type: JsonNodeTypes.FALSE = JsonNodeTypes.FALSE;
 }
 
-export class JsonFalse extends JsonValue {
-  constructor() {
-    super(false, JsonNodeTypes.FALSE);
-  }
-}
+export class JsonNull extends JsonNode implements IJsonValue {
+  public readonly value = null;
 
-export class JsonNull extends JsonValue {
-  constructor() {
-    super(null, JsonNodeTypes.NULL);
-  }
+  public readonly type: JsonNodeTypes.NULL = JsonNodeTypes.NULL;
 }
 
 const nodeTypeObjectMapping = {
@@ -149,7 +146,19 @@ const nodeTypeObjectMapping = {
   [JsonNodeTypes.FALSE]: JsonFalse,
   [JsonNodeTypes.NULL]: JsonNull,
 };
-
+export type JsonNodeType =
+  | JsonDocument
+  | JsonComment
+  | JsonObject
+  | JsonProperty
+  | JsonKey
+  | JsonArray
+  | JsonValue
+  | JsonString
+  | JsonNumber
+  | JsonTrue
+  | JsonFalse
+  | JsonNull;
 //
 // Utility methods to construct the objects
 //
@@ -163,7 +172,7 @@ export class NodeFactory {
 
 // Just a recursive, slow implementation to a JavaScript object from this
 // JsonNode
-function recursiveNodeConversion(rootNode: JsonNode): any {
+function recursiveNodeConversion(rootNode: JsonNodeType): any {
   let result = null;
   switch (rootNode.type) {
     case JsonNodeTypes.DOCUMENT:
@@ -188,8 +197,8 @@ function recursiveNodeConversion(rootNode: JsonNode): any {
     case JsonNodeTypes.KEY:
       return rootNode.value;
     case JsonNodeTypes.NUMBER: {
-      if (rootNode.value instanceof Number) return rootNode.value;
-      return new Number(rootNode.value).valueOf();
+      if (typeof rootNode.value === "number") return rootNode.value;
+      return parseFloat(rootNode.value);
     }
     case JsonNodeTypes.TRUE:
       return true;
@@ -202,7 +211,15 @@ function recursiveNodeConversion(rootNode: JsonNode): any {
   }
 }
 
-function toJSON(jsonNode: JsonNode): any {
+export function toObject<T extends object>(jsonNode: JsonNode): T {
+  return JSON.parse(JSON.stringify(jsonNode));
+}
+
+export function toString(jsonNode: JsonNode): string {
+  return JSON.stringify(jsonNode);
+}
+
+export function toJSON<T extends any>(jsonNode: JsonNodeType): T {
   if (!(jsonNode instanceof JsonNode)) throw new Error("JSON conversion only accepts a kind of JsonNode");
 
   return recursiveNodeConversion(jsonNode);

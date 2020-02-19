@@ -1,16 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
-import {
-  JsonComment,
-  JsonDocument,
-  JsonKey,
-  JsonNode,
-  JsonProperty,
-  JsonValue,
-  parse,
-  ParseSettings,
-  Visitor,
-} from "../src";
+import { JsonComment, JsonDocument, JsonKey, JsonProperty, parse, ParseSettings, toJSON, Visitor } from "../src";
+import { IJsonValue } from "../src/ast";
 
 function readFile(file: string): string {
   let src = fs.readFileSync(file, "utf8");
@@ -93,7 +84,7 @@ class TestAccumulatorVisitor extends Visitor {
     this.store.keys.push(keyNode.value);
   }
 
-  public value(valueNode: JsonValue): void {
+  public value(valueNode: IJsonValue): void {
     this.store.values = this.store.values || [];
     this.store.values.push(valueNode.value);
   }
@@ -128,7 +119,7 @@ class SkipAfterAKey extends Visitor {
     if (keyNode.value.length > 1) this.stop = true;
   }
 
-  public value(valueNode: JsonValue): void {
+  public value(valueNode: IJsonValue): void {
     this._store.push(valueNode.value);
   }
 }
@@ -182,6 +173,6 @@ describe("Object conversion to native JSON", function() {
     const NORMAL_JSON_BUFFER = JSON.stringify(JSON_TESTCASE);
     const documentNode = parse(NORMAL_JSON_BUFFER);
 
-    expect(JSON_TESTCASE).toEqual(JsonNode.toJSON(documentNode));
+    expect(JSON_TESTCASE).toEqual(toJSON(documentNode));
   });
 });
