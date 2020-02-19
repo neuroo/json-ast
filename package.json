@@ -39,7 +39,8 @@
   "scripts": {
     "prepublishOnly": "rm -rf dist && npm run build && rm -f dist/*.tsbuildinfo",
     "build": "tsc",
-    "test": "jest"
+    "test": "node --max_old_space_size=4096 --expose-gc ./node_modules/jest/bin/jest --logHeapUsage --runInBand",
+    "test:debug": "node --max_old_space_size=8192 --inspect-brk --expose-gc node_modules/.bin/jest --runInBand"
   },
   "devDependencies": {
     "@types/jest": "25.1.2",
