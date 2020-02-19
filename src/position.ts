@@ -5,24 +5,28 @@ interface PositionLocation {
 }
 
 export default class Position {
-  private readonly _start: PositionLocation;
-  private readonly _end: PositionLocation;
-  private readonly _human: string;
-  constructor(startLine, startColumn, startChar, endLine, endColumn, endChar) {
-    this._start = { line: startLine, column: startColumn, char: startChar };
-    this._end = { line: endLine, column: endColumn, char: endChar };
-    this._human = `${startLine}:${startColumn} - ${endLine}:${endColumn} [${startChar}:${endChar}]`;
-  }
+  constructor(
+    private readonly startLine: number,
+    private readonly startColumn: number,
+    private readonly startChar: string,
+    private readonly endLine: number,
+    private readonly endColumn: number,
+    private readonly endChar: string
+  ) {}
 
   get start() {
-    return this._start;
+    return {
+      line: this.startLine,
+      column: this.startColumn,
+      char: this.startChar
+    };
   }
 
   get end() {
-    return this._end;
+    return { line: this.endLine, column: this.endColumn, char: this.endChar };
   }
 
   get human() {
-    return this._human;
+    return `${this.startLine}:${this.startColumn} - ${this.endLine}:${this.endColumn} [${this.startChar}:${this.endChar}]`;
   }
 }
