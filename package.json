@@ -1,6 +1,10 @@
 {
   "name": "json-ast",
   "version": "2.1.7",
+  "engines": {
+    "node": "^4.9.1",
+    "npm": "^2.15.11"
+  },
   "description": "JSON parser AST utilities",
   "author": "Romain Gaucher",
   "homepage": "https://github.com/neuroo/json-ast",
