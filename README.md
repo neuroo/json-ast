@@ -105,7 +105,7 @@ const ast = parse(JSON_BUFFER, {verbose: true, junker: true});
 assert(ast instanceof AST.JsonDocument);
 
 const visitor = new MyVisitor();
-ast.visit(visitor);
+ast.accept(visitor);
 assert.deepEqual(visitor.comments, [" Some comment"]);
 
 // One can also the `JsonNode.toJSON` static method to convert to a JavaScript object
